@@ -24,7 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch('https://retro.umoiq.com/service/publicXMLFeed?command=agencyList');
             const data = await response.text();
             const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
-            agencyTag = xmlDoc.getElementsByTagName('agency')[27].getAttribute('tag');
+            agencyTag = xmlDoc.getElementsByTagName('agency')[0].getAttribute('tag');
+            // Escoje el 0, 27
 
             const routeListResponse = await fetch(`https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=${agencyTag}`);
             const routeListData = await routeListResponse.text();
@@ -179,7 +180,8 @@ document.addEventListener("DOMContentLoaded", function () {
             routeList.addEventListener('change', async () => {
                 selectedRouteTag = routeList.value;
                 lastTime = 0; // Reiniciar lastTime cuando se cambia de ruta
-                document.getElementById('svgSelectRoute').classList.remove('hidden');
+                document.getElementById('svgSelectRoute').classList.remove('invisible');
+                document.getElementById('svgSelectRoute').classList.add('visible');
                 if (selectedRouteTag && agencyTag) {
                 await fetchVehicleLocations();
                 }
@@ -187,7 +189,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             vehicleList.addEventListener('change', () => {
                 selectedVehicleId = vehicleList.value;
-                document.getElementById('svgSelectVehicle').classList.remove('hidden');
+                document.getElementById('svgSelectVehicle').classList.remove('invisible');
+                document.getElementById('svgSelectVehicle').classList.add('visible');
                 if (selectedVehicleId && agencyTag) {
                     fetchSelectedVehicleLocation();
                 }
