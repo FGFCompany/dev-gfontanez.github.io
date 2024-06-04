@@ -179,6 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
             routeList.addEventListener('change', async () => {
                 selectedRouteTag = routeList.value;
                 lastTime = 0; // Reiniciar lastTime cuando se cambia de ruta
+                document.getElementById('svgSelectRoute').classList.remove('hidden');
                 if (selectedRouteTag && agencyTag) {
                 await fetchVehicleLocations();
                 }
@@ -186,6 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             vehicleList.addEventListener('change', () => {
                 selectedVehicleId = vehicleList.value;
+                document.getElementById('svgSelectVehicle').classList.remove('hidden');
                 if (selectedVehicleId && agencyTag) {
                     fetchSelectedVehicleLocation();
                 }
