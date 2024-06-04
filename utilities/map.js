@@ -181,7 +181,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 selectedRouteTag = routeList.value;
                 lastTime = 0; // Reiniciar lastTime cuando se cambia de ruta
                 document.getElementById('svgSelectRoute').classList.remove('invisible');
-                document.getElementById('svgSelectRoute').classList.add('visible');
                 if (selectedRouteTag && agencyTag) {
                 await fetchVehicleLocations();
                 }
@@ -190,7 +189,6 @@ document.addEventListener("DOMContentLoaded", function () {
             vehicleList.addEventListener('change', () => {
                 selectedVehicleId = vehicleList.value;
                 document.getElementById('svgSelectVehicle').classList.remove('invisible');
-                document.getElementById('svgSelectVehicle').classList.add('visible');
                 if (selectedVehicleId && agencyTag) {
                     fetchSelectedVehicleLocation();
                 }
