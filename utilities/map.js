@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
         positionCell.classList.add('w-[250px]', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
 
         const speedCell = document.createElement('td');
-        speedCell.textContent = speed;
+        speedCell.textContent = speed + ' km/h';
         speedCell.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
 
         newRow.appendChild(vehicleCell);
