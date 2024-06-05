@@ -79,48 +79,53 @@
 
     <!-- Start block -->
     <section class="bg-gray-50 dark:bg-gray-800">
-        <div class="max-w-screen-xl px-4 pt-20 pb-8 mx-auto lg:pb-16">
+        <div class="max-w-screen-xl px-4 pt-20 max-sm:pt-16 pb-8 mx-auto lg:pb-16">
             <!-- Row -->
-            <div class="gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
+            <div class="gap-8 max-sm:mt-2 lg:grid lg:grid-cols-2 xl:gap-16">
                 <div class="text-gray-500 sm:text-lg dark:text-gray-400">
                     <h2 class="mb-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Tracking</h2>
                     <!-- List -->
                     <ul role="list" class="pt-3 mb-4 space-y-5 border-t border-gray-200 dark:border-gray-700">
                         <li class="flex space-x-3">
                             <!-- Icon -->
-                            <svg class="invisible flex-shrink-0 w-5 h-5 text-emerald-500 dark:text-emerald-400" fill="currentColor"
-                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" id="svgSelectRoute">
+                            <svg class="invisible flex-shrink-0 w-5 h-5 mt-[.15rem] max-sm:mt-1.5 text-emerald-500 dark:text-emerald-400"
+                                fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                                id="svgSelectRoute">
                                 <path fill-rule="evenodd"
                                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                     clip-rule="evenodd"></path>
                             </svg>
-                            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Step 1:
-                                Select an Route</span>
+                            <span
+                                class="text-base font-medium leading-tight text-nowrap mt-[.15rem] max-sm:mt-1.5 text-gray-900 dark:text-white">Step
+                                1: </span>
+                            <!-- Select -->
+                            <select id="routeTag"
+                                class="mb-2 pl-2 text-lg block w-full font-medium text-gray-900 bg-transparent border border-gray-200 rounded focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                                <option value="">Select Route...</option>
+                            </select>
                         </li>
-                        <!-- Select -->
-                        <select id="routeTag"
-                            class="mb-2 pl-2 text-lg block w-full font-medium text-gray-900 bg-transparent border border-gray-200 rounded focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-                            <option value="">Select Route...</option>
-                        </select>
                         <li class="flex space-x-3">
                             <!-- Icon -->
-                            <svg class="invisible flex-shrink-0 w-5 h-5 text-emerald-500 dark:text-emerald-400" fill="currentColor"
-                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" id="svgSelectVehicle">
+                            <svg class="invisible flex-shrink-0 w-5 h-5 mt-[.15rem] max-sm:mt-1.5 text-emerald-500 dark:text-emerald-400"
+                                fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+                                id="svgSelectVehicle">
                                 <path fill-rule="evenodd"
                                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                     clip-rule="evenodd"></path>
                             </svg>
-                            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Step 2:
-                                Select a Vehicle</span>
+                            <span
+                                class="text-base font-medium leading-tight text-nowrap mt-[.15rem] max-sm:mt-1.5 text-gray-900 dark:text-white">Step
+                                2: </span>
+                            <!-- Select -->
+                            <select id="vehicleTag"
+                                class="mb-4 pl-2 text-lg block w-full font-medium text-gray-900 bg-transparent border border-gray-200 rounded focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                                <option value="">Select Vehicle...</option>
+                            </select>
                         </li>
                     </ul>
-                    <!-- Select -->
-                    <select id="vehicleTag"
-                        class="mb-4 pl-2 text-lg block w-full font-medium text-gray-900 bg-transparent border border-gray-200 rounded focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-                        <option value="">Select Vehicle...</option>
-                    </select>
+
                     <!-- Map -->
-                    <div class="h-[30rem] max-sm:mb-10 rounded mb-4 z-0" id="map"></div>
+                    <div class="h-[30rem] max-sm:h-[20rem] max-sm:mb-10 rounded mb-4 z-0" id="map"></div>
                     <p class="max-sm:hidden mb-4 font-light lg:text-xl">Provide excellent service experiences quickly.
                         Speed up
                         essential development tasks, reduce repetitive work, and implement changes effortlessly.</p>

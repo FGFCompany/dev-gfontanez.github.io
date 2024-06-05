@@ -24,8 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch('https://retro.umoiq.com/service/publicXMLFeed?command=agencyList');
             const data = await response.text();
             const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
-            agencyTag = xmlDoc.getElementsByTagName('agency')[0].getAttribute('tag');
-            // Escoje el 0, 27
+            agencyTag = xmlDoc.getElementsByTagName('agency')[6].getAttribute('tag');
+            // Escoje el 0, 27, 6, quizas 1
 
             const routeListResponse = await fetch(`https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=${agencyTag}`);
             const routeListData = await routeListResponse.text();
