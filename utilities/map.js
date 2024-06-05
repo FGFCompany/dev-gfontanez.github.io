@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch('https://retro.umoiq.com/service/publicXMLFeed?command=agencyList');
             const data = await response.text();
             const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
-            agencyTag = xmlDoc.getElementsByTagName('agency')[6].getAttribute('tag');
+            agencyTag = xmlDoc.getElementsByTagName('agency')[27].getAttribute('tag');
             // Escoje el 0, 27, 6, quizas 1
 
             const routeListResponse = await fetch(`https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=${agencyTag}`);
@@ -78,65 +78,67 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     async function fetchSelectedVehicleLocation() {
-        const vehicleLocationUrl = `https://retro.umoiq.com/service/publicXMLFeed?command=vehicleLocation&a=${agencyTag}&v=${selectedVehicleId}`;
-        const response = await fetch(vehicleLocationUrl);
-        const data = await response.text();
-        const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
+        if (selectedVehicleId && agencyTag) {
+            const vehicleLocationUrl = `https://retro.umoiq.com/service/publicXMLFeed?command=vehicleLocation&a=${agencyTag}&v=${selectedVehicleId}`;
+            const response = await fetch(vehicleLocationUrl);
+            const data = await response.text();
+            const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
 
-        const vehicle = xmlDoc.getElementsByTagName('vehicle')[0];
-        console.log('Vehicle:', vehicle);
+            const vehicle = xmlDoc.getElementsByTagName('vehicle')[0];
+            console.log('Pase por aqui:');
 
-        if (vehicle) {
-            const lat = parseFloat(vehicle.getAttribute('lat'));
-            const lon = parseFloat(vehicle.getAttribute('lon'));
-            const speed = vehicle.getAttribute('speedKmHr');
+            if (vehicle) {
+                const lat = parseFloat(vehicle.getAttribute('lat'));
+                const lon = parseFloat(vehicle.getAttribute('lon'));
+                const speed = vehicle.getAttribute('speedKmHr');
 
-            const popupContent = `<b>Vehicle:</b> ${selectedVehicleId}<br><b>Speed:</b> ${speed} km/h`;
+                const popupContent = `<b>Vehicle:</b> ${selectedVehicleId}<br><b>Speed:</b> ${speed} km/h`;
 
-            if (markers[selectedVehicleId]) {
-                markers[selectedVehicleId].setLatLng([lat, lon]);
-                markers[selectedVehicleId].bindPopup(popupContent).openPopup();
-            } else {
-                markers[selectedVehicleId] = L.marker([lat, lon])
-                    .bindPopup(popupContent)
-                    .addTo(map)
-                    .openPopup();
-            }
-            map.panTo([lat, lon]);
-
-            if (executionCount < 10) {
-            const apiUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
-            const reverseResponse = await fetch(apiUrl);
-            const reverseData = await reverseResponse.json();
-            const road = reverseData.address.road || 'No street name was found';
-            console.log('Nombre de la calle:', road);
-
-            const { data: insertedData, error } = await database
-                .from('tracking')
-                .insert([
-                    {
-                        vehicle: selectedVehicleId,
-                        position: [lat, lon],
-                        positionGeocoded: road,
-                        speed: speed
-                    }
-                ])
-                .select('*');
-
-            if (error) {
-                console.error('Error inserting data into Supabase:', error);
-            } else {
-                console.log('Inserted data:', insertedData);
-                if (insertedData.length > 0) {
-                    const insertedRecord = insertedData[0];
-                    console.log('Vehicle:', insertedRecord.vehicle);
-                    console.log('Position Geocoded:', insertedRecord.positionGeocoded);
-                    console.log('Speed:', insertedRecord.speed);
-
-                    insertVehicleData(insertedRecord.vehicle, insertedRecord.positionGeocoded, insertedRecord.speed);
+                if (markers[selectedVehicleId]) {
+                    markers[selectedVehicleId].setLatLng([lat, lon]);
+                    markers[selectedVehicleId].bindPopup(popupContent).openPopup();
+                } else {
+                    markers[selectedVehicleId] = L.marker([lat, lon])
+                        .bindPopup(popupContent)
+                        .addTo(map)
+                        .openPopup();
                 }
-            }
-            executionCount++;
+                map.panTo([lat, lon]);
+
+                if (executionCount < 10) {
+                    const apiUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+                    const reverseResponse = await fetch(apiUrl);
+                    const reverseData = await reverseResponse.json();
+                    const road = reverseData.address.road || 'No street name was found';
+                    console.log('Nombre de la calle:', road);
+
+                    const { data: insertedData, error } = await database
+                        .from('tracking')
+                        .insert([
+                            {
+                                vehicle: selectedVehicleId,
+                                position: [lat, lon],
+                                positionGeocoded: road,
+                                speed: speed
+                            }
+                        ])
+                        .select('*');
+
+                    if (error) {
+                        console.error('Error inserting data into Supabase:', error);
+                    } else {
+                        console.log('Inserted data:', insertedData);
+                        if (insertedData.length > 0) {
+                            const insertedRecord = insertedData[0];
+                            console.log('Vehicle:', insertedRecord.vehicle);
+                            console.log('Position Geocoded:', insertedRecord.positionGeocoded);
+                            console.log('Speed:', insertedRecord.speed);
+
+                            insertVehicleData(insertedRecord.vehicle, insertedRecord.positionGeocoded, insertedRecord.speed);
+                        }
+                    }
+                    executionCount++;
+                }
             }
         }
     }
@@ -182,7 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 lastTime = 0; // Reiniciar lastTime cuando se cambia de ruta
                 document.getElementById('svgSelectRoute').classList.remove('invisible');
                 if (selectedRouteTag && agencyTag) {
-                await fetchVehicleLocations();
+                    await fetchVehicleLocations();
                 }
             });
 
@@ -195,6 +197,88 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     }
+
+    async function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const tableBody = document.getElementById('vehicleData');
+        const rows = tableBody.querySelectorAll('tr');
+    
+        // Configurar estilos y título
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Vehicle Tracking Data', 14, 22);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
+    
+        doc.setFontSize(12);
+        let y = 44; // Posición inicial en Y
+    
+        // Agregar encabezados con estilo
+        doc.setDrawColor(0); // Color del borde (negro)
+        doc.setFillColor(200); // Color de fondo (gris claro)
+        doc.setLineWidth(0.1); // Ancho del borde
+    
+        doc.rect(14, y, 56, 10, 'FD'); // Rectángulo para 'Vehicle'
+        doc.rect(70, y, 70, 10, 'FD'); // Rectángulo para 'Position'
+        doc.rect(140, y, 50, 10, 'FD'); // Rectángulo para 'Speed'
+    
+        doc.text('Vehicle', 18, y + 6); // Texto para 'Vehicle'
+        doc.text('Position', 74, y + 6); // Texto para 'Position'
+        doc.text('Speed', 144, y + 6); // Texto para 'Speed'
+    
+        y += 20;
+    
+        // Crear tabla en el PDF
+        rows.forEach((row, index) => {
+            const cols = row.querySelectorAll('td');
+            if (cols.length > 0) {
+                doc.text(cols[0].textContent, 22, y);
+                doc.text(cols[1].textContent, 74, y);
+                doc.text(cols[2].textContent, 146, y);
+                y += 10;
+            }
+        });
+    
+        // Guardar el PDF
+        doc.save('vehicle_tracking_data.pdf');
+    }
+    
+    // Agregar evento al botón de descarga de PDF
+    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+    downloadPdfBtn.addEventListener('click', generatePDF);
+    
+
+    function generateExcel() {
+        // Crear un libro de Excel
+        var workbook = XLSX.utils.book_new();
+        // Crear una hoja de cálculo
+        var sheetData = [['Vehicle Tracking Data'],
+                        ['Gilberto Fontanez A Software Developer Report'],
+                        [' '] ,['Vehicle', 'Position', 'Speed']];
+        var tableBody = document.getElementById('vehicleData');
+        var rows = tableBody.querySelectorAll('tr');
+        rows.forEach((row, index) => {
+            const cols = row.querySelectorAll('td');
+            if (cols.length > 0) {
+                sheetData.push([
+                    cols[0].textContent,
+                    cols[1].textContent,
+                    cols[2].textContent
+                ]);
+            }
+        });
+        var ws = XLSX.utils.aoa_to_sheet(sheetData);
+        // Agregar la hoja al libro
+        XLSX.utils.book_append_sheet(workbook, ws, 'Vehicle Tracking Data');
+        // Guardar el archivo de Excel
+        XLSX.writeFile(workbook, 'vehicle_tracking_data.xlsx');
+    }
+
+    // Agregar evento al botón de descarga de Excel
+    const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+    downloadExcelBtn.addEventListener('click', generateExcel);
 
     // Llamar a la función para obtener la lista de agencias y rutas
     getVehicleLocations();

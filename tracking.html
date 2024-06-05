@@ -81,11 +81,11 @@
     <section class="bg-gray-50 dark:bg-gray-800">
         <div class="max-w-screen-xl px-4 pt-20 max-sm:pt-16 pb-8 mx-auto lg:pb-16">
             <!-- Row -->
-            <div class="gap-8 max-sm:mt-2 lg:grid lg:grid-cols-2 xl:gap-16">
+            <div class="gap-8 max-sm:mt-3 lg:grid lg:grid-cols-2 xl:gap-16">
                 <div class="text-gray-500 sm:text-lg dark:text-gray-400">
                     <h2 class="mb-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Tracking</h2>
                     <!-- List -->
-                    <ul role="list" class="pt-3 mb-4 space-y-5 border-t border-gray-200 dark:border-gray-700">
+                    <ul role="list" class="pt-3 max-sm:pt-8 mb-4 space-y-5 border-t border-gray-200 dark:border-gray-700">
                         <li class="flex space-x-3">
                             <!-- Icon -->
                             <svg class="invisible flex-shrink-0 w-5 h-5 mt-[.15rem] max-sm:mt-1.5 text-emerald-500 dark:text-emerald-400"
@@ -96,7 +96,7 @@
                                     clip-rule="evenodd"></path>
                             </svg>
                             <span
-                                class="text-base font-medium leading-tight text-nowrap mt-[.15rem] max-sm:mt-1.5 text-gray-900 dark:text-white">Step
+                                class="text-base font-medium leading-tight text-nowrap mt-[.15rem] max-sm:mt-1.5 max-sm:hidden text-gray-900 dark:text-white">Step
                                 1: </span>
                             <!-- Select -->
                             <select id="routeTag"
@@ -114,7 +114,7 @@
                                     clip-rule="evenodd"></path>
                             </svg>
                             <span
-                                class="text-base font-medium leading-tight text-nowrap mt-[.15rem] max-sm:mt-1.5 text-gray-900 dark:text-white">Step
+                                class="text-base font-medium leading-tight text-nowrap mt-[.15rem] max-sm:mt-1.5 max-sm:hidden text-gray-900 dark:text-white">Step
                                 2: </span>
                             <!-- Select -->
                             <select id="vehicleTag"
@@ -125,7 +125,7 @@
                     </ul>
 
                     <!-- Map -->
-                    <div class="h-[30rem] max-sm:h-[20rem] max-sm:mb-10 rounded mb-4 z-0" id="map"></div>
+                    <div class="h-[30rem] max-sm:h-[20rem] max-sm:mb-14 rounded mb-4 z-0" id="map"></div>
                     <p class="max-sm:hidden mb-4 font-light lg:text-xl">Provide excellent service experiences quickly.
                         Speed up
                         essential development tasks, reduce repetitive work, and implement changes effortlessly.</p>
@@ -179,24 +179,22 @@
                     </section>
                     <!-- Extras -->
                     <div class="space-y-4 mb-4 sm:flex sm:space-y-0 sm:space-x-4">
-                        <a href=""
-                            class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+                        <button id="downloadPdfBtn" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
                             <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"
                                 fill="red">
                                 <path
                                     d="M369.9 97.9 286 14C277.7 5.7 266.1 0 253.5 0H160c-26.5 0-48 21.5-48 48v112H48c-26.5 0-48 21.5-48 48v208c0 26.5 21.5 48 48 48h48v32c0 26.5 21.5 48 48 48h208c26.5 0 48-21.5 48-48V142.5c0-12.6-5.1-24.7-14.1-33.6zM259.5 41.9 335 117.5h-59.5c-8.8 0-16-7.2-16-16V41.9zm76.5 426.1c0 8.8-7.2 16-16 16H160c-8.8 0-16-7.2-16-16v-32h139.7c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9H176v-32h56c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9h-56v-32h96c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9h-96V96c0-8.8 7.2-16 16-16h80v56c0 26.5 21.5 48 48 48h48v288zm-240-208v208c0 8.8-7.2 16-16 16H48c-8.8 0-16-7.2-16-16V224c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16zm32 136v-16c0-4.4 3.6-8 8-8h5.6c6.9 0 13.5 3.6 17.1 9.5l7.7 12.3c2.9 4.7 9.7 4.7 12.6 0l7.7-12.3c3.6-5.9 10.1-9.5 17.1-9.5H192c4.4 0 8 3.6 8 8v16c0 4.4-3.6 8-8 8h-5.6c-6.9 0-13.5-3.6-17.1-9.5l-7.7-12.3c-2.9-4.7-9.7-4.7-12.6 0l-7.7 12.3c-3.6 5.9-10.1 9.5-17.1 9.5H136c-4.4 0-8-3.6-8-8zm152-64v16c0 4.4-3.6 8-8 8h-80c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h80c4.4 0 8 3.6 8 8z" />
                             </svg>
                             Generate PDF
-                        </a>
-                        <a href=""
-                            class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+                        </button>
+                        <button id="downloadExcelBtn" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
                             <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
                                 fill="green">
                                 <path
                                     d="M438.6 160H416V64c0-35.35-28.65-64-64-64H96C60.65 0 32 28.65 32 64v96H9.4C4.176 160 0 164.2 0 169.4V192c0 4.375 4.375 9.594 9.4 9.594H32v160H9.4C4.176 361.6 0 365.8 0 371V393.4C0 398.6 4.176 403.8 9.4 403.8H32v44.2C32 484.2 60.65 512 96 512H352c35.35 0 64-28.65 64-64v-44.2h22.6c5.225 0 9.4-4.199 9.4-9.4V371c0-4.375-4.375-9.594-9.4-9.594H416V201.6h22.6c5.225 0 9.4-4.199 9.4-9.4V169.4C448 164.2 443.8 160 438.6 160zM96 48h256c8.836 0 16 7.164 16 16v96H80V64C80 55.16 87.16 48 96 48zM32 170.4H416V192H32V170.4zM32 361.6H416V393.4H32V361.6zM416 448c0 8.836-7.164 16-16 16H96c-8.836 0-16-7.164-16-16v-44.2h336V448zM256 324h-16v56H160v-56h-16V288h112V324zM224 288h-64v32h64V288zM368 324H320v16h32v16H320v16h48V324zM272 352H240V320H208v32H160V320H112v32H80v-48h192v48H272z" />
                             </svg>
                             Generate Excel
-                        </a>
+                        </button>
                     </div>
 
 
@@ -236,8 +234,10 @@
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./utilities/map.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.3/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="./utilities/map.js"></script>
 <script src="https://unpkg.com/flowbite@1.4.1/dist/flowbite.js"></script>
 
 </html>
