@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
     const database = supabase.createClient('https://svdtdtpqscizmxlcicox.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZHRkdHBxc2Npem14bGNpY294Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY2NTU2ODEsImV4cCI6MjAzMjIzMTY4MX0.9Hkev2jhj11Q6r6DXrf2gpixaVTDj2vODRYwpxB5Y50');
     const map = L.map('map').setView([37.7749, -122.4194], 16);
@@ -16,7 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let markers = {};
     let agencyTag = null;
     let lastTime = 0;
-    let executionCount = 0;
+    let fetchInterval = null;
+    let tableCounter = 0;
 
     // Función para obtener la lista de agencias y rutas
     async function getAgencyAndRouteList() {
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch('https://retro.umoiq.com/service/publicXMLFeed?command=agencyList');
             const data = await response.text();
             const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
-            agencyTag = xmlDoc.getElementsByTagName('agency')[27].getAttribute('tag');
+            agencyTag = xmlDoc.getElementsByTagName('agency')[6].getAttribute('tag');
             // Escoje el 0, 27, 6, quizas 1
 
             const routeListResponse = await fetch(`https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=${agencyTag}`);
@@ -104,8 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         .openPopup();
                 }
                 map.panTo([lat, lon]);
-
-                if (executionCount < 10) {
+                if (tableCounter < 10) {
                     const apiUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
                     const reverseResponse = await fetch(apiUrl);
                     const reverseData = await reverseResponse.json();
@@ -137,11 +136,13 @@ document.addEventListener("DOMContentLoaded", function () {
                             insertVehicleData(insertedRecord.vehicle, insertedRecord.positionGeocoded, insertedRecord.speed);
                         }
                     }
-                    executionCount++;
+
+                    tableCounter++;
                 }
             }
         }
     }
+
 
     function insertVehicleData(vehicle, positionGeocoded, speed) {
         const tableBody = document.getElementById('vehicleData');
@@ -161,10 +162,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const positionCell = document.createElement('td');
         positionCell.textContent = positionGeocoded;
-        positionCell.classList.add('w-[250px]', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+        positionCell.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
 
         const speedCell = document.createElement('td');
-        speedCell.textContent = speed + ' km/h';
+        speedCell.textContent = speed;
         speedCell.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
 
         newRow.appendChild(vehicleCell);
@@ -174,36 +175,38 @@ document.addEventListener("DOMContentLoaded", function () {
         tableBody.appendChild(newRow);
     }
 
-    async function getVehicleLocations() {
-        const { routeListToHTML } = await getAgencyAndRouteList();
+    routeList.addEventListener('change', function () {
+        selectedRouteTag = this.value;
+        lastTime = 0; // Reiniciar lastTime cuando se cambia de ruta
+        document.getElementById('svgSelectRoute').classList.remove('invisible');
+        fetchVehicleLocations();
+    });
+
+    vehicleList.addEventListener('change', function () {
+        selectedVehicleId = this.value;
+        fetchSelectedVehicleLocation();
+
+        if (fetchInterval) {
+            clearInterval(fetchInterval);
+        }
+        document.getElementById('svgSelectVehicle').classList.remove('invisible');
+        // Fetch data every 10 seconds
+        fetchInterval = setInterval(fetchSelectedVehicleLocation, 10000);
+    });
+
+    getAgencyAndRouteList().then(({ routeListToHTML }) => {
+        // Añadir las opciones obtenidas de routeList al final de la lista en lugar de reemplazar el contenido
         if (routeListToHTML) {
             routeList.innerHTML += routeListToHTML;
-
-            routeList.addEventListener('change', async () => {
-                selectedRouteTag = routeList.value;
-                lastTime = 0; // Reiniciar lastTime cuando se cambia de ruta
-                document.getElementById('svgSelectRoute').classList.remove('invisible');
-                if (selectedRouteTag && agencyTag) {
-                    await fetchVehicleLocations();
-                }
-            });
-
-            vehicleList.addEventListener('change', () => {
-                selectedVehicleId = vehicleList.value;
-                document.getElementById('svgSelectVehicle').classList.remove('invisible');
-                if (selectedVehicleId && agencyTag) {
-                    fetchSelectedVehicleLocation();
-                }
-            });
         }
-    }
+    });
 
     async function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const tableBody = document.getElementById('vehicleData');
         const rows = tableBody.querySelectorAll('tr');
-    
+
         // Configurar estilos y título
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
@@ -211,25 +214,25 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.setFontSize(12);
         doc.setFont('helvetica', 'normal');
         doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
-    
+
         doc.setFontSize(12);
         let y = 44; // Posición inicial en Y
-    
+
         // Agregar encabezados con estilo
         doc.setDrawColor(0); // Color del borde (negro)
         doc.setFillColor(200); // Color de fondo (gris claro)
         doc.setLineWidth(0.1); // Ancho del borde
-    
+
         doc.rect(14, y, 56, 10, 'FD'); // Rectángulo para 'Vehicle'
         doc.rect(70, y, 70, 10, 'FD'); // Rectángulo para 'Position'
         doc.rect(140, y, 50, 10, 'FD'); // Rectángulo para 'Speed'
-    
+
         doc.text('Vehicle', 18, y + 6); // Texto para 'Vehicle'
         doc.text('Position', 74, y + 6); // Texto para 'Position'
         doc.text('Speed', 144, y + 6); // Texto para 'Speed'
-    
+
         y += 20;
-    
+
         // Crear tabla en el PDF
         rows.forEach((row, index) => {
             const cols = row.querySelectorAll('td');
@@ -240,23 +243,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 y += 10;
             }
         });
-    
+
         // Guardar el PDF
         doc.save('vehicle_tracking_data.pdf');
     }
-    
+
     // Agregar evento al botón de descarga de PDF
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
     downloadPdfBtn.addEventListener('click', generatePDF);
-    
+
 
     function generateExcel() {
         // Crear un libro de Excel
         var workbook = XLSX.utils.book_new();
         // Crear una hoja de cálculo
         var sheetData = [['Vehicle Tracking Data'],
-                        ['Gilberto Fontanez A Software Developer Report'],
-                        [' '] ,['Vehicle', 'Position', 'Speed']];
+        ['Gilberto Fontanez A Software Developer Report'],
+        [' '], ['Vehicle', 'Position', 'Speed']];
         var tableBody = document.getElementById('vehicleData');
         var rows = tableBody.querySelectorAll('tr');
         rows.forEach((row, index) => {
@@ -279,14 +282,4 @@ document.addEventListener("DOMContentLoaded", function () {
     // Agregar evento al botón de descarga de Excel
     const downloadExcelBtn = document.getElementById('downloadExcelBtn');
     downloadExcelBtn.addEventListener('click', generateExcel);
-
-    // Llamar a la función para obtener la lista de agencias y rutas
-    getVehicleLocations();
-
-    // Configurar un intervalo para actualizar la ubicación del vehículo seleccionado cada 10 segundos
-    setInterval(fetchSelectedVehicleLocation, 10000);
 });
-
-
-
-
