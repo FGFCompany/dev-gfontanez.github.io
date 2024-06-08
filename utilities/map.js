@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const database = supabase.createClient('https://svdtdtpqscizmxlcicox.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZHRkdHBxc2Npem14bGNpY294Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY2NTU2ODEsImV4cCI6MjAzMjIzMTY4MX0.9Hkev2jhj11Q6r6DXrf2gpixaVTDj2vODRYwpxB5Y50');
-    const map = L.map('map').setView([37.7749, -122.4194], 16);
+    const map = L.map('map').setView([37.7749, -122.4194], 17);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // Función para obtener las ubicaciones de los vehículos
     async function fetchVehicleLocations() {
         const vehicleLocationUrl = `https://retro.umoiq.com/service/publicXMLFeed?command=vehicleLocations&a=${agencyTag}&r=${selectedRouteTag}&t=${lastTime}`;
         const response = await fetch(vehicleLocationUrl);
@@ -71,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
         vehicleList.innerHTML = vehicleListToHTML;
 
         // Actualizar el último tiempo (lastTime)
+        // lastTime se utiliza como request para almacenar el tiempo de la última actualización de los datos por ruta y reducir el uso de ancho de banda
         const lastTimeElement = xmlDoc.getElementsByTagName('lastTime')[0];
         if (lastTimeElement) {
             lastTime = lastTimeElement.getAttribute('time');
@@ -177,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     routeList.addEventListener('change', function () {
         selectedRouteTag = this.value;
-        lastTime = 0; // Reiniciar lastTime cuando se cambia de ruta
+        lastTime = 0; // Reiniciar lastTime para cuando se cambia de ruta obtener datos nuevos al ultimo return del route API ya almacenado.
         document.getElementById('svgSelectRoute').classList.remove('invisible');
         fetchVehicleLocations();
     });
@@ -201,7 +203,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    async function generatePDF() {
+// Reports 
+    async function generatePDF(event) {
+        event.preventDefault();
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const tableBody = document.getElementById('vehicleData');
@@ -253,7 +257,8 @@ document.addEventListener("DOMContentLoaded", function () {
     downloadPdfBtn.addEventListener('click', generatePDF);
 
 
-    function generateExcel() {
+    function generateExcel(event) {
+        event.preventDefault();
         // Crear un libro de Excel
         var workbook = XLSX.utils.book_new();
         // Crear una hoja de cálculo
