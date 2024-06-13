@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-// Reports 
+    // Reports 
     async function generatePDF(event) {
         event.preventDefault();
         const { jsPDF } = window.jspdf;
@@ -248,8 +248,16 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Guardar el PDF
-        doc.save('vehicle_tracking_data.pdf');
+        // Configurar la acción de impresión automática
+        doc.autoPrint();
+
+        // Abrir el documento PDF en una nueva pestaña o ventana del navegador
+        const filename = 'vehicle_tracking_data.pdf';
+        try {
+            window.open(doc.output('bloburl', { filename: filename }))
+        } catch (error) {
+            doc.save(filename);
+        }
     }
 
     // Agregar evento al botón de descarga de PDF
