@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function getCookie(name) {
         const nameEQ = name + "=";
         const ca = document.cookie.split(';');
-        for(let i = 0; i < ca.length; i++) {
+        for (let i = 0; i < ca.length; i++) {
             let c = ca[i];
             while (c.charAt(0) === ' ') c = c.substring(1, c.length);
             if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
@@ -55,51 +55,105 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function insertRecordData(fullName, priority, subject, description) {
-        const tableBody = document.getElementById('newTicket');
+        const tableBody = document.getElementById('tbobyTicket');
 
-        // Remove "No data available" row if it exists
-        const noDataRow = document.getElementById('noDataRow');
-        if (noDataRow) {
-            noDataRow.remove();
-        }
+         // Remove "No data available" row if it exists
+         const noDataRow = document.getElementById('noDataRow');
+         if (noDataRow) {
+             noDataRow.remove();
+         }
 
-        // Create new row with record data
-        const newRow = document.createElement('tr');
+         // Create new row with record data
+         const newRow = document.createElement('tr');
+                            //  InnerHtml easy to use and easy to read but less secure
+                            //      newRow.innerHTML = `
+                            //      <td class="fullnameSelect px-6 py-3 text-left text-xs font-medium text-gray-900 dark:text-white">${fullName}</td>
+                            //      <td class="subjectSelect hover:underline truncate px-6 py-3 text-left text-xs font-medium text-sky-500 dark:text-sky-400">
+                            //          <a href="#">${subject}</a>
+                            //      </td>
+                            //      <td class="prioritySelect px-6 py-3 text-left text-xs font-medium text-gray-900 dark:text-white">${priority}</td>
+                            //      <td class="descriptionSelect truncate px-6 py-3 text-left text-xs font-medium text-gray-900 dark:text-white">${description}</td>
+                            //  `;
+         // Create cells for each column
+         const fullNameCell = document.createElement('td');
+         fullNameCell.textContent = fullName;
+         fullNameCell.classList.add('fullnameSelect', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+ 
+         const subjectCell = document.createElement('td');
+         const subjectLink = document.createElement('a');
+         subjectLink.href = '#';
+         subjectLink.textContent = subject;
+         subjectLink.classList.add('subjectSelect', 'hover:underline', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-sky-500', 'dark:text-sky-400');
+         subjectCell.appendChild(subjectLink);
+ 
+         const priorityCell = document.createElement('td');
+         priorityCell.textContent = priority;
+         priorityCell.classList.add('prioritySelect', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+ 
+         const descriptionCell = document.createElement('td');
+         descriptionCell.textContent = description;
+         descriptionCell.classList.add('descriptionSelect', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+ 
+         newRow.appendChild(fullNameCell);
+         newRow.appendChild(subjectCell);
+         newRow.appendChild(priorityCell);
+         newRow.appendChild(descriptionCell);
+ 
+         tableBody.appendChild(newRow);
+         addRowClickListeners()
+     }
 
-        const fullNameCell = document.createElement('td');
-        fullNameCell.textContent = fullName;
-        fullNameCell.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+    // Función para agregar eventos de clic a las filas de la tabla
+    function addRowClickListeners() {
+        document.querySelectorAll('tr').forEach(row => {
+            // Remover cualquier evento de clic existente
+            row.removeEventListener('click', handleRowClick);
 
-        const priorityCell = document.createElement('td');
-        priorityCell.textContent = priority;
-        priorityCell.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+            // Agregar el nuevo evento de clic
+            row.addEventListener('click', handleRowClick);
+        });
+    }
 
-        const subjectCell = document.createElement('td');
-        subjectCell.textContent = subject;
-        subjectCell.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+    // Función manejadora del evento de clic en las filas
+    function handleRowClick(event) {
+        selectedRow = event.currentTarget; // Guardar la fila seleccionada
 
-        const descriptionCell = document.createElement('td');
-        descriptionCell.textContent = description;
-        descriptionCell.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+        // Obtener la data de la fila seleccionada
+        const fullnameSelect = selectedRow.querySelector('.fullnameSelect').innerText;
+        const priority = selectedRow.querySelector('.prioritySelect').innerText;
+        const description = selectedRow.querySelector('.descriptionSelect').innerText;
+        const subject = selectedRow.querySelector('.subjectSelect').innerText;
 
-        newRow.appendChild(fullNameCell);
-        newRow.appendChild(priorityCell);
-        newRow.appendChild(subjectCell);
-        newRow.appendChild(descriptionCell);
+        // Mostrar el modal con id "static-modal"
+        const modal = document.getElementById('static-modal');
+        modal.style.display = 'flex';
+        const disableSubject = document.getElementById('subject');
+        disableSubject.setAttribute('readonly', true);
+        disableSubject.classList.add('opacity-50');
+        const saveNewTicket = document.getElementById('saveNewTicket');
+        saveNewTicket.classList.add('hidden');
+        const updateNewTicket = document.getElementById('updateNewTicket');
+        updateNewTicket.classList.remove('hidden');
+        document.getElementById('fullName').value = fullnameSelect;
+        document.getElementById('priority').value = priority;
+        document.getElementById('subject').value = subject;
+        document.getElementById('description').value = description;
 
-        tableBody.appendChild(newRow);
+        // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
+        const closeBtn = document.getElementById('closeBtn');
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
     }
 
     document.getElementById('saveNewTicket').addEventListener('click', onSaveNewTicket);
-
     async function onSaveNewTicket(event) {
         event.preventDefault();
-
         const fullName = document.getElementById('fullName').value;
         const priority = document.getElementById('priority').value;
         const subject = document.getElementById('subject').value;
         const description = document.getElementById('description').value;
-
+        
         // Verificar si los campos no están vacíos
         if (fullName && priority && subject && description) {
             await insertDataToSupabase(fullName, priority, subject, description, sessionID);
@@ -109,27 +163,79 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     async function insertDataToSupabase(fullName, priority, subject, description, sessionID) {
-        const { data: insertedData, error } = await database
-            .from('ticket')
-            .insert([
-                {
-                    fullName: fullName,
-                    priority: priority,
-                    subject: subject,
-                    description: description,
-                    sessionID: sessionID
-                }
-            ])
-            .select('*');
+        try {
+            const { data: insertedData, error } = await database
+                .from('ticket')
+                .insert([{ fullName, priority, subject, description, sessionID }])
+                .select('*');
 
-        if (error) {
-            console.error('Error inserting data into Supabase:', error);
-        } else {
+            if (error) throw error;
+
             if (insertedData.length > 0) {
                 const insertedRecord = insertedData[0];
                 insertRecordData(insertedRecord.fullName, insertedRecord.priority, insertedRecord.subject, insertedRecord.description);
+                clearFormFields();
                 document.querySelector('[data-modal-hide="static-modal"]').click();
             }
+        } catch (error) {
+            console.error('Error inserting data into Supabase:', error);
         }
     }
+
+    function clearFormFields() {
+        document.getElementById('fullName').value = "";
+        document.getElementById('priority').value = "";
+        document.getElementById('subject').value = "";
+        document.getElementById('description').value = "";
+    }
+
+    document.getElementById("updateNewTicket").addEventListener("click", function () {
+        const fullName = document.getElementById("fullName").value;
+        const priority = document.getElementById("priority").value;
+        const subject = document.getElementById("subject").value;
+        const description = document.getElementById("description").value;
+        updateTicketDataToSupabase(fullName, priority, subject, description);
+    });
+
+    async function updateTicketDataToSupabase(fullName, priority, subject, description) {
+        try {
+            const { data: updatedData, error } = await database
+                .from('ticket')
+                .update({ fullName, priority, description })
+                .eq('subject', subject)
+            if (error) {
+                throw error;
+            }
+                // Cerrar el modal
+                document.querySelector('[data-modal-hide="static-modal"]').click();
+            
+        } catch (error) {
+            console.error('Error updating data in Supabase:', error);
+        }
+    }
+
+    // Función para suscribirse a los cambios en tiempo real de la tabla "ticket"
+    function subscribeToRealtimeUpdates() {
+        database
+            .channel('public:ticket')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'ticket' }, payload => {
+                const record = payload.new;
+                // Actualizar la tabla HTML basada en los cambios en tiempo real
+                const rows = document.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const subjectCell = row.querySelector('.subjectSelect');
+                    if (subjectCell && subjectCell.innerText === record.subject) {
+                        row.querySelector('.fullnameSelect').innerText = record.fullName;
+                        row.querySelector('.prioritySelect').innerText = record.priority;
+                        row.querySelector('.descriptionSelect').innerText = record.description;
+                    }
+                });
+            })
+            .subscribe();
+    }
+
+    // Llamar a la función para suscribirse a las actualizaciones en tiempo real
+    subscribeToRealtimeUpdates();
+
 });
+
