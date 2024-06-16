@@ -27,8 +27,22 @@ document.addEventListener("DOMContentLoaded", function () {
         // La cookie de sesión existe, continuar usándola
         console.log("ID existente:", sessionID);
     }
-
+    // DB SupaBase API
     const database = supabase.createClient('https://svdtdtpqscizmxlcicox.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZHRkdHBxc2Npem14bGNpY294Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY2NTU2ODEsImV4cCI6MjAzMjIzMTY4MX0.9Hkev2jhj11Q6r6DXrf2gpixaVTDj2vODRYwpxB5Y50');
+
+
+    // Función para agregar la fila de "No data available"
+    function addNoDataRow() {
+        const tableBody = document.getElementById('tbobyTicket');
+        const newRow = document.createElement('tr');
+        newRow.id = 'noDataRow';
+        const newCell = document.createElement('td');
+        newCell.classList.add('px-6', 'py-5', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+        newCell.textContent = 'No data available';
+        newCell.setAttribute('colspan', '4'); // Para que la celda ocupe todas las columnas de la tabla
+        newRow.appendChild(newCell);
+        tableBody.appendChild(newRow);
+    }
 
     // Cargar y mostrar los registros al cargar la página
     loadRecords();
@@ -38,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .from('ticket')
             .select('*')
             .eq('sessionID', sessionID)
-            .order('created_at', { ascending: false })
+            .order('created_at', { ascending: true })
             .limit(5);
 
         if (error) {
@@ -50,6 +64,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 records.forEach(record => {
                     insertRecordData(record.fullName, record.priority, record.subject, record.description);
                 });
+            } else {
+                addNoDataRow();
             }
         }
     }
@@ -57,51 +73,53 @@ document.addEventListener("DOMContentLoaded", function () {
     function insertRecordData(fullName, priority, subject, description) {
         const tableBody = document.getElementById('tbobyTicket');
 
-         // Remove "No data available" row if it exists
-         const noDataRow = document.getElementById('noDataRow');
-         if (noDataRow) {
-             noDataRow.remove();
-         }
+        // Eliminar la fila de "No data available" si existe
+        const noDataRow = document.getElementById('noDataRow');
+        if (noDataRow) {
+            noDataRow.remove();
+        }
 
-         // Create new row with record data
-         const newRow = document.createElement('tr');
-                            //  InnerHtml easy to use and easy to read but less secure
-                            //      newRow.innerHTML = `
-                            //      <td class="fullnameSelect px-6 py-3 text-left text-xs font-medium text-gray-900 dark:text-white">${fullName}</td>
-                            //      <td class="subjectSelect hover:underline truncate px-6 py-3 text-left text-xs font-medium text-sky-500 dark:text-sky-400">
-                            //          <a href="#">${subject}</a>
-                            //      </td>
-                            //      <td class="prioritySelect px-6 py-3 text-left text-xs font-medium text-gray-900 dark:text-white">${priority}</td>
-                            //      <td class="descriptionSelect truncate px-6 py-3 text-left text-xs font-medium text-gray-900 dark:text-white">${description}</td>
-                            //  `;
-         // Create cells for each column
-         const fullNameCell = document.createElement('td');
-         fullNameCell.textContent = fullName;
-         fullNameCell.classList.add('fullnameSelect', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
- 
-         const subjectCell = document.createElement('td');
-         const subjectLink = document.createElement('a');
-         subjectLink.href = '#';
-         subjectLink.textContent = subject;
-         subjectLink.classList.add('subjectSelect', 'hover:underline', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-sky-500', 'dark:text-sky-400');
-         subjectCell.appendChild(subjectLink);
- 
-         const priorityCell = document.createElement('td');
-         priorityCell.textContent = priority;
-         priorityCell.classList.add('prioritySelect', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
- 
-         const descriptionCell = document.createElement('td');
-         descriptionCell.textContent = description;
-         descriptionCell.classList.add('descriptionSelect', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
- 
-         newRow.appendChild(fullNameCell);
-         newRow.appendChild(subjectCell);
-         newRow.appendChild(priorityCell);
-         newRow.appendChild(descriptionCell);
- 
-         tableBody.appendChild(newRow);
-         addRowClickListeners()
-     }
+        // Create new row with record data
+        const newRow = document.createElement('tr');
+        // Create cells for each column
+        const fullNameCell = document.createElement('td');
+        fullNameCell.textContent = fullName;
+        fullNameCell.classList.add('fullnameSelect', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+        fullNameCell.style.maxWidth = '80px';
+        fullNameCell.style.overflow = 'hidden';
+        fullNameCell.style.textOverflow = 'ellipsis';
+
+        const subjectCell = document.createElement('td');
+        const subjectLink = document.createElement('a');
+        subjectLink.textContent = subject;
+        subjectLink.classList.add('subjectSelect', 'hover:underline', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-sky-500', 'dark:text-sky-400');
+        subjectCell.appendChild(subjectLink);
+        subjectCell.style.maxWidth = '50px';
+        subjectCell.style.overflow = 'hidden';
+        subjectCell.style.textOverflow = 'ellipsis';
+
+        const priorityCell = document.createElement('td');
+        priorityCell.textContent = priority;
+        priorityCell.classList.add('prioritySelect', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+        priorityCell.style.maxWidth = '80px';
+        priorityCell.style.overflow = 'hidden';
+        priorityCell.style.textOverflow = 'ellipsis';
+        
+        const descriptionCell = document.createElement('td');
+        descriptionCell.textContent = description;
+        descriptionCell.classList.add('descriptionSelect', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+        descriptionCell.style.maxWidth = '100px';
+        descriptionCell.style.overflow = 'hidden';
+        descriptionCell.style.textOverflow = 'ellipsis';
+
+        newRow.appendChild(fullNameCell);
+        newRow.appendChild(subjectCell);
+        newRow.appendChild(priorityCell);
+        newRow.appendChild(descriptionCell);
+
+        tableBody.appendChild(newRow);
+        addRowClickListeners()
+    }
 
     // Función para agregar eventos de clic a las filas de la tabla
     function addRowClickListeners() {
@@ -145,7 +163,27 @@ document.addEventListener("DOMContentLoaded", function () {
             modal.style.display = 'none';
         });
     }
-
+    // Funcion para abrir y cerrar el modal
+    document.getElementById('openNewTicket').addEventListener('click', onOpenNewTicket);
+    async function onOpenNewTicket(event) {
+        event.preventDefault();
+        const modal = document.getElementById('static-modal');
+        modal.style.display = 'flex';
+        const saveNewTicket = document.getElementById('saveNewTicket');
+        saveNewTicket.classList.remove('hidden');
+        const updateNewTicket = document.getElementById('updateNewTicket');
+        updateNewTicket.classList.add('hidden');
+        const enableSubject = document.getElementById('subject');
+        enableSubject.removeAttribute('readonly');
+        enableSubject.classList.remove('opacity-50');
+        clearFormFields();
+        // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
+        const closeBtn = document.getElementById('closeBtn');
+        closeBtn.addEventListener('click', async () => {
+            modal.style.display = 'none';
+        });
+    }
+    // Funcion para validar y llamar función para insertar datos
     document.getElementById('saveNewTicket').addEventListener('click', onSaveNewTicket);
     async function onSaveNewTicket(event) {
         event.preventDefault();
@@ -153,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const priority = document.getElementById('priority').value;
         const subject = document.getElementById('subject').value;
         const description = document.getElementById('description').value;
-        
+
         // Verificar si los campos no están vacíos
         if (fullName && priority && subject && description) {
             await insertDataToSupabase(fullName, priority, subject, description, sessionID);
@@ -161,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error('Todos los campos deben ser completados.');
         }
     }
-
+    // Funcion para insertar datos
     async function insertDataToSupabase(fullName, priority, subject, description, sessionID) {
         try {
             const { data: insertedData, error } = await database
@@ -184,7 +222,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function clearFormFields() {
         document.getElementById('fullName').value = "";
-        document.getElementById('priority').value = "";
+        document.getElementById('priority').value = "Normal";
         document.getElementById('subject').value = "";
         document.getElementById('description').value = "";
     }
@@ -198,19 +236,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     async function updateTicketDataToSupabase(fullName, priority, subject, description) {
-        try {
-            const { data: updatedData, error } = await database
-                .from('ticket')
-                .update({ fullName, priority, description })
-                .eq('subject', subject)
-            if (error) {
-                throw error;
-            }
-                // Cerrar el modal
-                document.querySelector('[data-modal-hide="static-modal"]').click();
-            
-        } catch (error) {
+        const { data: updatedData, error } = await database
+            .from('ticket')
+            .update({ fullName, priority, description })
+            .eq('subject', subject);
+        if (error) {
             console.error('Error updating data in Supabase:', error);
+        } else {
+            // Cerrar el modal
+            document.querySelector('[data-modal-hide="static-modal"]').click();
         }
     }
 
