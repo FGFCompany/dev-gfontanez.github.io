@@ -31,8 +31,34 @@ document.addEventListener("DOMContentLoaded", function () {
     const database = supabase.createClient('https://svdtdtpqscizmxlcicox.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZHRkdHBxc2Npem14bGNpY294Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY2NTU2ODEsImV4cCI6MjAzMjIzMTY4MX0.9Hkev2jhj11Q6r6DXrf2gpixaVTDj2vODRYwpxB5Y50');
 
 
+    // Cargar y mostrar los registros al cargar la página
+    loadRecords();
+
+    async function loadRecords() {
+        const { data: records, error } = await database
+            .from('ticket')
+            .select('*')
+            .eq('sessionID', sessionID)
+            .order('created_at', { ascending: false })
+            .limit(5);
+
+        if (error) {
+            console.error('Error fetching data from Supabase:', error);
+        } else {
+            // Iterar sobre los registros en la tabla
+            if (records.length > 0) {
+                // Insertar los registros en la tabla
+                records.forEach(loadRecord => {
+                    addDataRow(loadRecord.fullName, loadRecord.priority, loadRecord.subject, loadRecord.description, loadRecord.id);
+                });
+            } else {
+                addNODataRow();
+            }
+        }
+    }
+
     // Función para agregar la fila de "No data available"
-    function addNoDataRow() {
+    function addNODataRow() {
         const tableBody = document.getElementById('tbobyTicket');
         const newRow = document.createElement('tr');
         newRow.id = 'noDataRow';
@@ -44,35 +70,9 @@ document.addEventListener("DOMContentLoaded", function () {
         tableBody.appendChild(newRow);
     }
 
-    // Cargar y mostrar los registros al cargar la página
-    loadRecords();
-
-    async function loadRecords() {
-        const { data: records, error } = await database
-            .from('ticket')
-            .select('*')
-            .eq('sessionID', sessionID)
-            .order('created_at', { ascending: true })
-            .limit(5);
-
-        if (error) {
-            console.error('Error fetching data from Supabase:', error);
-        } else {
-            // Iterar sobre los registros en la tabla
-            if (records.length > 0) {
-                // Insertar los registros en la tabla
-                records.forEach(record => {
-                    insertRecordData(record.fullName, record.priority, record.subject, record.description);
-                });
-            } else {
-                addNoDataRow();
-            }
-        }
-    }
-
-    function insertRecordData(fullName, priority, subject, description) {
+    // Función para insertar datos a la tabla
+    function addDataRow(fullName, priority, subject, description, id) {
         const tableBody = document.getElementById('tbobyTicket');
-
         // Eliminar la fila de "No data available" si existe
         const noDataRow = document.getElementById('noDataRow');
         if (noDataRow) {
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
         priorityCell.style.maxWidth = '80px';
         priorityCell.style.overflow = 'hidden';
         priorityCell.style.textOverflow = 'ellipsis';
-        
+
         const descriptionCell = document.createElement('td');
         descriptionCell.textContent = description;
         descriptionCell.classList.add('descriptionSelect', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
@@ -112,10 +112,19 @@ document.addEventListener("DOMContentLoaded", function () {
         descriptionCell.style.overflow = 'hidden';
         descriptionCell.style.textOverflow = 'ellipsis';
 
+        const idCell = document.createElement('td');
+        idCell.value = id;
+        idCell.classList.add('idSelect', 'hidden', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+        idCell.style.maxWidth = '100px';
+        idCell.style.overflow = 'hidden';
+        idCell.style.textOverflow = 'ellipsis';
+
         newRow.appendChild(fullNameCell);
         newRow.appendChild(subjectCell);
         newRow.appendChild(priorityCell);
         newRow.appendChild(descriptionCell);
+        newRow.appendChild(idCell);
+
 
         tableBody.appendChild(newRow);
         addRowClickListeners()
@@ -138,24 +147,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Obtener la data de la fila seleccionada
         const fullnameSelect = selectedRow.querySelector('.fullnameSelect').innerText;
-        const priority = selectedRow.querySelector('.prioritySelect').innerText;
-        const description = selectedRow.querySelector('.descriptionSelect').innerText;
-        const subject = selectedRow.querySelector('.subjectSelect').innerText;
+        const prioritySelect = selectedRow.querySelector('.prioritySelect').innerText;
+        const subjectSelect = selectedRow.querySelector('.subjectSelect').innerText;
+        const descriptionSelect = selectedRow.querySelector('.descriptionSelect').innerText;
 
         // Mostrar el modal con id "static-modal"
         const modal = document.getElementById('static-modal');
         modal.style.display = 'flex';
-        const disableSubject = document.getElementById('subject');
-        disableSubject.setAttribute('readonly', true);
-        disableSubject.classList.add('opacity-50');
         const saveNewTicket = document.getElementById('saveNewTicket');
         saveNewTicket.classList.add('hidden');
+        const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');
+        downloadTicketPdfBtn.classList.remove('hidden');
+        downloadTicketPdfBtn.classList.add('inline-flex');
         const updateNewTicket = document.getElementById('updateNewTicket');
         updateNewTicket.classList.remove('hidden');
+
+        // Convertir los innerText a values de los campos
         document.getElementById('fullName').value = fullnameSelect;
-        document.getElementById('priority').value = priority;
-        document.getElementById('subject').value = subject;
-        document.getElementById('description').value = description;
+        document.getElementById('priority').value = prioritySelect;
+        document.getElementById('subject').value = subjectSelect;
+        document.getElementById('description').value = descriptionSelect;
+   
+
+
 
         // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
         const closeBtn = document.getElementById('closeBtn');
@@ -163,27 +177,31 @@ document.addEventListener("DOMContentLoaded", function () {
             modal.style.display = 'none';
         });
     }
-    // Funcion para abrir y cerrar el modal
+
+    // Funcion para abrir y cerrar el modal en New Ticket
     document.getElementById('openNewTicket').addEventListener('click', onOpenNewTicket);
     async function onOpenNewTicket(event) {
         event.preventDefault();
         const modal = document.getElementById('static-modal');
         modal.style.display = 'flex';
+        const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');
+        downloadTicketPdfBtn.classList.add('hidden');
+        downloadTicketPdfBtn.classList.remove('inline-flex');
         const saveNewTicket = document.getElementById('saveNewTicket');
         saveNewTicket.classList.remove('hidden');
         const updateNewTicket = document.getElementById('updateNewTicket');
         updateNewTicket.classList.add('hidden');
-        const enableSubject = document.getElementById('subject');
-        enableSubject.removeAttribute('readonly');
-        enableSubject.classList.remove('opacity-50');
-        clearFormFields();
+        // Resetear el formulario
+        document.getElementById('ticketForm').reset();
+
         // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
         const closeBtn = document.getElementById('closeBtn');
         closeBtn.addEventListener('click', async () => {
             modal.style.display = 'none';
         });
     }
-    // Funcion para validar y llamar función para insertar datos
+
+    // Funcion para validar y llamar función para insertar datos en el boton Save
     document.getElementById('saveNewTicket').addEventListener('click', onSaveNewTicket);
     async function onSaveNewTicket(event) {
         event.preventDefault();
@@ -199,6 +217,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error('Todos los campos deben ser completados.');
         }
     }
+
     // Funcion para insertar datos
     async function insertDataToSupabase(fullName, priority, subject, description, sessionID) {
         try {
@@ -211,8 +230,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (insertedData.length > 0) {
                 const insertedRecord = insertedData[0];
-                insertRecordData(insertedRecord.fullName, insertedRecord.priority, insertedRecord.subject, insertedRecord.description);
-                clearFormFields();
+                addDataRow(insertedRecord.fullName, insertedRecord.priority, insertedRecord.subject, insertedRecord.description, insertedRecord.id);
+                // Resetear el formulario
+                document.getElementById('ticketForm').reset();
                 document.querySelector('[data-modal-hide="static-modal"]').click();
             }
         } catch (error) {
@@ -220,26 +240,21 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function clearFormFields() {
-        document.getElementById('fullName').value = "";
-        document.getElementById('priority').value = "Normal";
-        document.getElementById('subject').value = "";
-        document.getElementById('description').value = "";
-    }
-
+    // Funcion para validar y llamar función para actualizar datos en el boton Save Changes
     document.getElementById("updateNewTicket").addEventListener("click", function () {
         const fullName = document.getElementById("fullName").value;
         const priority = document.getElementById("priority").value;
         const subject = document.getElementById("subject").value;
         const description = document.getElementById("description").value;
-        updateTicketDataToSupabase(fullName, priority, subject, description);
+        const id = selectedRow.querySelector('.idSelect').value;
+        updateTicketDataToSupabase(fullName, priority, subject, description, id);
     });
-
-    async function updateTicketDataToSupabase(fullName, priority, subject, description) {
+    // Funcion para actualizar datos
+    async function updateTicketDataToSupabase(fullName, priority, subject, description, id) {
         const { data: updatedData, error } = await database
             .from('ticket')
-            .update({ fullName, priority, description })
-            .eq('subject', subject);
+            .update({ fullName, priority, subject, description })
+            .eq('id', id); // Usar el ID insertado como condición
         if (error) {
             console.error('Error updating data in Supabase:', error);
         } else {
@@ -253,15 +268,16 @@ document.addEventListener("DOMContentLoaded", function () {
         database
             .channel('public:ticket')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'ticket' }, payload => {
-                const record = payload.new;
+                const subscribeRecord = payload.new;
                 // Actualizar la tabla HTML basada en los cambios en tiempo real
                 const rows = document.querySelectorAll('tr');
                 rows.forEach(row => {
-                    const subjectCell = row.querySelector('.subjectSelect');
-                    if (subjectCell && subjectCell.innerText === record.subject) {
-                        row.querySelector('.fullnameSelect').innerText = record.fullName;
-                        row.querySelector('.prioritySelect').innerText = record.priority;
-                        row.querySelector('.descriptionSelect').innerText = record.description;
+                    const idCell = row.querySelector('.idSelect');
+                    if (idCell && idCell.value === subscribeRecord.id) {
+                        row.querySelector('.fullnameSelect').innerText = subscribeRecord.fullName;
+                        row.querySelector('.subjectSelect').innerText = subscribeRecord.subject;
+                        row.querySelector('.prioritySelect').innerText = subscribeRecord.priority;
+                        row.querySelector('.descriptionSelect').innerText = subscribeRecord.description;
                     }
                 });
             })

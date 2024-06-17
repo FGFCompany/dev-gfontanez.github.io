@@ -2587,10 +2587,6 @@ video {
   -moz-osx-font-smoothing: auto;
 }
 
-.opacity-50 {
-  opacity: 0.5;
-}
-
 .bg-blend-normal {
   background-blend-mode: normal;
 }
@@ -2745,8 +2741,8 @@ video {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-.shadow-emerald-900\/100 {
-  --tw-shadow-color: rgb(6 78 59 / 1);
+.shadow-gray-700\/100 {
+  --tw-shadow-color: rgb(55 65 81 / 1);
   --tw-shadow: var(--tw-shadow-colored);
 }
 
@@ -3132,8 +3128,8 @@ element::-webkit-scrollbar {
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   }
 
-  .max-sm\:shadow-emerald-900\/100 {
-    --tw-shadow-color: rgb(6 78 59 / 1);
+  .max-sm\:shadow-gray-700\/100 {
+    --tw-shadow-color: rgb(55 65 81 / 1);
     --tw-shadow: var(--tw-shadow-colored);
   }
 }
