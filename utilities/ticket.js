@@ -134,15 +134,15 @@ document.addEventListener("DOMContentLoaded", function () {
     function addRowClickListeners() {
         document.querySelectorAll('tr').forEach(row => {
             // Remover cualquier evento de clic existente
-            row.removeEventListener('click', handleRowClick);
+            row.removeEventListener('click', handleRowTicketSelect);
 
             // Agregar el nuevo evento de clic
-            row.addEventListener('click', handleRowClick);
+            row.addEventListener('click', handleRowTicketSelect);
         });
     }
 
     // Función manejadora del evento de clic en las filas
-    function handleRowClick(event) {
+    function handleRowTicketSelect(event) {
         selectedRow = event.currentTarget; // Guardar la fila seleccionada
 
         // Obtener la data de la fila seleccionada
@@ -150,10 +150,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const prioritySelect = selectedRow.querySelector('.prioritySelect').innerText;
         const subjectSelect = selectedRow.querySelector('.subjectSelect').innerText;
         const descriptionSelect = selectedRow.querySelector('.descriptionSelect').innerText;
+        const idSelect = selectedRow.querySelector('.idSelect').value;
 
         // Mostrar el modal con id "static-modal"
         const modal = document.getElementById('static-modal');
         modal.style.display = 'flex';
+        document.getElementById('modalTitle').innerText = 'Ticket-' + idSelect;
         const saveNewTicket = document.getElementById('saveNewTicket');
         saveNewTicket.classList.add('hidden');
         const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');
@@ -184,6 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
         event.preventDefault();
         const modal = document.getElementById('static-modal');
         modal.style.display = 'flex';
+        document.getElementById('modalTitle').innerText = 'New Ticket';
         const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');
         downloadTicketPdfBtn.classList.add('hidden');
         downloadTicketPdfBtn.classList.remove('inline-flex');
