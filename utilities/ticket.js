@@ -32,9 +32,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // Cargar y mostrar los registros al cargar la página
-    loadRecords();
+    loadTableRecords();
 
-    async function loadRecords() {
+    async function loadTableRecords() {
         const { data: records, error } = await database
             .from('ticket')
             .select('*')
@@ -134,28 +134,28 @@ document.addEventListener("DOMContentLoaded", function () {
     function addRowClickListeners() {
         document.querySelectorAll('tr').forEach(row => {
             // Remover cualquier evento de clic existente
-            row.removeEventListener('click', handleRowTicketSelect);
+            row.removeEventListener('click', rowTicketSelected);
 
             // Agregar el nuevo evento de clic
-            row.addEventListener('click', handleRowTicketSelect);
+            row.addEventListener('click', rowTicketSelected);
         });
     }
 
     // Función manejadora del evento de clic en las filas
-    function handleRowTicketSelect(event) {
+    function rowTicketSelected(event) {
         selectedRow = event.currentTarget; // Guardar la fila seleccionada
-
         // Obtener la data de la fila seleccionada
         const fullnameSelect = selectedRow.querySelector('.fullnameSelect').innerText;
         const prioritySelect = selectedRow.querySelector('.prioritySelect').innerText;
         const subjectSelect = selectedRow.querySelector('.subjectSelect').innerText;
         const descriptionSelect = selectedRow.querySelector('.descriptionSelect').innerText;
         const idSelect = selectedRow.querySelector('.idSelect').value;
-
         // Mostrar el modal con id "static-modal"
         const modal = document.getElementById('static-modal');
         modal.style.display = 'flex';
         document.getElementById('modalTitle').innerText = 'Ticket-' + idSelect;
+        const commentSection = document.getElementById('commentSection');
+        commentSection.classList.remove('hidden');
         const saveNewTicket = document.getElementById('saveNewTicket');
         saveNewTicket.classList.add('hidden');
         const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');
@@ -163,22 +163,60 @@ document.addEventListener("DOMContentLoaded", function () {
         downloadTicketPdfBtn.classList.add('inline-flex');
         const updateNewTicket = document.getElementById('updateNewTicket');
         updateNewTicket.classList.remove('hidden');
-
         // Convertir los innerText a values de los campos
         document.getElementById('fullName').value = fullnameSelect;
         document.getElementById('priority').value = prioritySelect;
         document.getElementById('subject').value = subjectSelect;
         document.getElementById('description').value = descriptionSelect;
-   
-
-
-
+        // Cargar los comentarios
+        loadComments(idSelect);
         // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
         const closeBtn = document.getElementById('closeBtn');
         closeBtn.addEventListener('click', () => {
             modal.style.display = 'none';
         });
     }
+
+    async function loadComments(ticketId) {
+        const { data: ticketWithComments, error } = await database
+            .from('ticket')
+            .select('comments')
+            .eq('id', ticketId);
+
+        if (error) {
+            console.error('Error fetching ticket with comments:', error);
+        } else {
+            // Mostrar los comentarios en el modal
+            const commentSection = document.getElementById('readcomments');
+            commentSection.innerHTML = ''; // Limpiar comentarios anteriores
+            commentSection.classList.add('w-full', 'p-1', 'rounded', 'bg-gray-200', 'dark:bg-gray-700', 'pointer-events-none');
+
+            if (ticketWithComments.length > 0 && ticketWithComments[0].comments !== null && ticketWithComments[0].comments !== " ") {
+                const comments = ticketWithComments[0].comments;
+                if (comments.length > 0) {
+                    const commentList = document.createElement('ul');
+                    comments.forEach(comment => {
+                        const commentItem = document.createElement('li');
+                        commentItem.textContent = comment;
+                        commentItem.classList.add('bg-slate-300', 'dark:bg-slate-600', 'rounded', 'm-2', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+                        commentList.appendChild(commentItem);
+                    });
+                    commentSection.appendChild(commentList);
+                } else {
+                    const noCommentsMsg = document.createElement('div');
+                    noCommentsMsg.textContent = 'No hay comentarios';
+                    noCommentsMsg.classList.add('bg-slate-300', 'dark:bg-slate-600', 'rounded', 'm-2', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+                    commentSection.appendChild(noCommentsMsg);
+                }
+            } else {
+                const noCommentsMsg = document.createElement('div');
+                noCommentsMsg.textContent = 'No hay comentarios';
+                noCommentsMsg.classList.add('bg-slate-300', 'dark:bg-slate-600', 'rounded', 'm-2', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+                commentSection.appendChild(noCommentsMsg);
+            }
+        }
+    }
+
 
     // Funcion para abrir y cerrar el modal en New Ticket
     document.getElementById('openNewTicket').addEventListener('click', onOpenNewTicket);
@@ -187,6 +225,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const modal = document.getElementById('static-modal');
         modal.style.display = 'flex';
         document.getElementById('modalTitle').innerText = 'New Ticket';
+        const commentSection = document.getElementById('commentSection');
+        commentSection.classList.add('hidden');
         const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');
         downloadTicketPdfBtn.classList.add('hidden');
         downloadTicketPdfBtn.classList.remove('inline-flex');
@@ -196,7 +236,6 @@ document.addEventListener("DOMContentLoaded", function () {
         updateNewTicket.classList.add('hidden');
         // Resetear el formulario
         document.getElementById('ticketForm').reset();
-
         // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
         const closeBtn = document.getElementById('closeBtn');
         closeBtn.addEventListener('click', async () => {
@@ -204,7 +243,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Funcion para validar y llamar función para insertar datos en el boton Save
     document.getElementById('saveNewTicket').addEventListener('click', onSaveNewTicket);
     async function onSaveNewTicket(event) {
         event.preventDefault();
@@ -212,24 +250,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const priority = document.getElementById('priority').value;
         const subject = document.getElementById('subject').value;
         const description = document.getElementById('description').value;
-
         // Verificar si los campos no están vacíos
-        if (fullName && priority && subject && description) {
-            await insertDataToSupabase(fullName, priority, subject, description, sessionID);
-        } else {
+        if (!fullName || !priority || !subject || !description) {
             console.error('Todos los campos deben ser completados.');
+            return;
         }
-    }
-
-    // Funcion para insertar datos
-    async function insertDataToSupabase(fullName, priority, subject, description, sessionID) {
         try {
             const { data: insertedData, error } = await database
                 .from('ticket')
                 .insert([{ fullName, priority, subject, description, sessionID }])
                 .select('*');
 
-            if (error) throw error;
+            if (error) {
+                throw error;
+            }
 
             if (insertedData.length > 0) {
                 const insertedRecord = insertedData[0];
@@ -237,41 +271,74 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Resetear el formulario
                 document.getElementById('ticketForm').reset();
                 document.querySelector('[data-modal-hide="static-modal"]').click();
+            } else {
+                console.error('Error al insertar el registro.');
             }
-        } catch (error) {
-            console.error('Error inserting data into Supabase:', error);
+        } catch (err) {
+            console.error('Error al insertar el registro:', err.message);
         }
     }
 
+
     // Funcion para validar y llamar función para actualizar datos en el boton Save Changes
-    document.getElementById("updateNewTicket").addEventListener("click", function () {
+    document.getElementById("updateNewTicket").addEventListener("click", onUpdateTicket);
+    async function onUpdateTicket(event) {
+        event.preventDefault();
         const fullName = document.getElementById("fullName").value;
         const priority = document.getElementById("priority").value;
         const subject = document.getElementById("subject").value;
         const description = document.getElementById("description").value;
         const id = selectedRow.querySelector('.idSelect').value;
-        updateTicketDataToSupabase(fullName, priority, subject, description, id);
-    });
-    // Funcion para actualizar datos
-    async function updateTicketDataToSupabase(fullName, priority, subject, description, id) {
+        // Primero, obtenemos el array de comentarios actual
         const { data: updatedData, error } = await database
             .from('ticket')
             .update({ fullName, priority, subject, description })
-            .eq('id', id); // Usar el ID insertado como condición
+            .eq('id', id);
         if (error) {
             console.error('Error updating data in Supabase:', error);
         } else {
             // Cerrar el modal
             document.querySelector('[data-modal-hide="static-modal"]').click();
         }
-    }
+    };
+
+
+    // Funcion para agregar un nuevo comentario
+    document.getElementById("addComment").addEventListener("click", onAddComment);
+    async function onAddComment(event) {
+        event.preventDefault();
+        const comment = document.getElementById("comments").value;
+        const id = selectedRow.querySelector('.idSelect').value;
+        // Primero, obtenemos el array de comentarios actual
+        const { data: currentCommentsData, error } = await database
+            .from('ticket')
+            .select('comments')
+            .eq('id', id);
+        if (error) {
+            console.error('Error fetching current comments:', error);
+        } else {
+            const currentComments = currentCommentsData[0]?.comments || [];
+            const updatedComments = [...currentComments, comment];
+            const { data: updatedData, error } = await database
+                .from('ticket')
+                .update({ comments: updatedComments })
+                .eq('id', id);
+            if (error) {
+                console.error('Error updating comments in Supabase:', error);
+            } else {
+                document.getElementById("comments").value = "";
+            }
+        }
+    };
+
 
     // Función para suscribirse a los cambios en tiempo real de la tabla "ticket"
-    function subscribeToRealtimeUpdates() {
-        database
+    async function subscribeToRealtimeUpdates() {
+        const { error } = await database
             .channel('public:ticket')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'ticket' }, payload => {
                 const subscribeRecord = payload.new;
+                const readcomments = document.getElementById('readcomments');
                 // Actualizar la tabla HTML basada en los cambios en tiempo real
                 const rows = document.querySelectorAll('tr');
                 rows.forEach(row => {
@@ -281,14 +348,191 @@ document.addEventListener("DOMContentLoaded", function () {
                         row.querySelector('.subjectSelect').innerText = subscribeRecord.subject;
                         row.querySelector('.prioritySelect').innerText = subscribeRecord.priority;
                         row.querySelector('.descriptionSelect').innerText = subscribeRecord.description;
+
+                        // Crear nuevas filas para los comentarios
+                        if (subscribeRecord.comments && Array.isArray(subscribeRecord.comments)) {
+                            readcomments.innerHTML = '';
+                            const commentList = document.createElement('ul');
+                            commentList.classList.add('w-full', 'rounded', 'bg-gray-200', 'dark:bg-gray-700', 'pointer-events-none');
+                            subscribeRecord.comments.forEach(comment => {
+                                const commentItem = document.createElement('li');
+                                commentItem.textContent = comment;
+                                commentItem.classList.add('bg-slate-300', 'dark:bg-slate-600', 'rounded', 'm-2', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+                                commentList.appendChild(commentItem);
+                            });
+                            readcomments.innerHTML = '';
+                            readcomments.appendChild(commentList);
+                        }
                     }
                 });
             })
             .subscribe();
     }
-
     // Llamar a la función para suscribirse a las actualizaciones en tiempo real
     subscribeToRealtimeUpdates();
+
+
+    // Reports
+    async function generatePDFTicket(event) {
+        event.preventDefault();
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const ticketForm = document.getElementById('ticketForm');
+
+        // Obtener los valores del formulario
+        const fullName = ticketForm.querySelector('#fullName').value;
+        const priority = ticketForm.querySelector('#priority').value;
+        const subject = ticketForm.querySelector('#subject').value;
+        const description = ticketForm.querySelector('#description').value;
+
+        // Obtener los comentarios
+        const commentList = ticketForm.querySelector('#readcomments ul');
+        const comments = Array.from(commentList.querySelectorAll('li')).map(li => li.textContent);
+
+        // Configurar estilos y título
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Vehicle Tracking Data', 14, 22);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
+
+        // Agregar los datos del formulario al PDF
+        doc.setFontSize(12);
+        let y = 44; // Posición inicial en Y
+
+        doc.text('Full Name:', 14, y);
+        doc.text(fullName, 60, y);
+        y += 10;
+
+        doc.text('Priority:', 14, y);
+        doc.text(priority, 60, y);
+        y += 10;
+
+        doc.text('Subject:', 14, y);
+        doc.text(subject, 60, y);
+        y += 10;
+
+        doc.text('Description:', 14, y);
+        doc.text(description, 60, y);
+        y += 10;
+
+        doc.text('Comments:', 14, y);
+        doc.text(comments, 60, y);
+        y += 10;
+
+        // Configurar la acción de impresión automática
+        doc.autoPrint();
+
+        // Abrir el documento PDF en una nueva pestaña o ventana del navegador
+        const filename = 'vehicle_tracking_data.pdf';
+        try {
+            window.open(doc.output('bloburl', { filename: filename }))
+        } catch (error) {
+            doc.save(filename);
+        }
+    }
+    // Agregar evento al botón de descarga de PDF
+    const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');
+    downloadTicketPdfBtn.addEventListener('click', generatePDFTicket);
+
+
+    // Reports Table
+    async function generatePDFTable(event) {
+        event.preventDefault();
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const tableBody = document.getElementById('tbobyTicket');
+
+        // Configurar estilos y título
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Vehicle Tracking Data', 14, 22);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
+
+        // Agregar encabezados con estilo
+        doc.setFontSize(10);
+        let y = 40; // Posición inicial en Y
+
+        doc.setDrawColor(0); // Color del borde (negro)
+        doc.setFillColor(200); // Color de fondo (gris claro)
+        doc.setLineWidth(0.1); // Ancho del borde
+
+        doc.rect(14, y, 40, 8, 'FD'); // Rectángulo para 'Full Name'
+        doc.rect(54, y, 40, 8, 'FD'); // Rectángulo para 'Subject'
+        doc.rect(94, y, 30, 8, 'FD'); // Rectángulo para 'Priority'
+        doc.rect(124, y, 60, 8, 'FD'); // Rectángulo para 'Description'
+
+        doc.text('Full Name', 16, y + 5); // Texto para 'Full Name'
+        doc.text('Subject', 56, y + 5); // Texto para 'Subject'
+        doc.text('Priority', 96, y + 5); // Texto para 'Priority'
+        doc.text('Description', 126, y + 5); // Texto para 'Description'
+
+        y += 15;
+
+        // Crear tabla en el PDF
+        const rows = tableBody.querySelectorAll('tr');
+        rows.forEach((row, index) => {
+            const cols = row.querySelectorAll('td');
+            if (cols.length > 0) {
+                doc.text(cols[0].textContent, 16, y);
+                doc.text(cols[1].textContent, 56, y);
+                doc.text(cols[2].textContent, 96, y);
+                doc.text(cols[3].textContent, 126, y);
+                y += 8;
+            }
+        });
+
+        // Configurar la acción de impresión automática
+        doc.autoPrint();
+
+        // Abrir el documento PDF en una nueva pestaña o ventana del navegador
+        const filename = 'vehicle_tracking_data.pdf';
+        try {
+            window.open(doc.output('bloburl', { filename: filename }));
+        } catch (error) {
+            doc.save(filename);
+        }
+    }
+    // Agregar evento al botón de descarga de PDF
+    const downloadPdfBtnTable = document.getElementById('downloadPdfBtnTable');
+    downloadPdfBtnTable.addEventListener('click', generatePDFTable);
+
+
+    // Reports
+    async function generateExcelTable(event) {
+        event.preventDefault();
+        // Crear un libro de Excel
+        var workbook = XLSX.utils.book_new();
+        // Crear una hoja de cálculo
+        var sheetData = [['Vehicle Tracking Data'],
+        ['Gilberto Fontanez A Software Developer Report'],
+        [' '], ['Full Name', 'Subject', 'Priority', 'Description']];
+        var tableBody = document.getElementById('tbobyTicket');
+        var rows = tableBody.querySelectorAll('tr');
+        rows.forEach((row, index) => {
+            const cols = row.querySelectorAll('td');
+            if (cols.length > 0) {
+                sheetData.push([
+                    cols[0].textContent,
+                    cols[1].textContent,
+                    cols[2].textContent,
+                    cols[3].textContent
+                ]);
+            }
+        });
+        var ws = XLSX.utils.aoa_to_sheet(sheetData);
+        // Agregar la hoja al libro
+        XLSX.utils.book_append_sheet(workbook, ws, 'Vehicle Tracking Data');
+        // Guardar el archivo de Excel
+        XLSX.writeFile(workbook, 'vehicle_tracking_data.xlsx');
+    }
+
+    // Agregar evento al botón de descarga de Excel
+    const downloadExcelBtnTable = document.getElementById('downloadExcelBtnTable');
+    downloadExcelBtnTable.addEventListener('click', generateExcelTable);
 
 });
 
