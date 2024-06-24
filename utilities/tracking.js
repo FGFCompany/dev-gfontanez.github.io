@@ -307,18 +307,17 @@ document.addEventListener("DOMContentLoaded", function () {
             selectedMap = L.map('trackingSelectedMap').setView([coordinatesSelect[0], coordinatesSelect[1]], 18);
             console.log('selectedMap coordinates:', coordinatesSelect);
             const tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png';
-            // 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
             L.tileLayer(tileUrl, {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(selectedMap);
             L.marker([coordinatesSelect[0], coordinatesSelect[1]]).addTo(selectedMap).bindPopup(popupContent).openPopup();
 
 
-            trackingSelectedPdfBtn.addEventListener('click', async () => {
+            trackingSelectedPdfBtn.addEventListener('click', () => {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF();
                 const trackingSelectedMap = document.getElementById('trackingSelectedMap');
-                const mapCanvas = await html2canvas(trackingSelectedMap, {
+                html2canvas(trackingSelectedMap, {
                     logging: true,
                     scale: 1,
                     letterRenderer: 1,
@@ -329,11 +328,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const imgData = canvas.toDataURL('image/png');
                     pdf.addImage(imgData, 'PNG', 5, 10, imgWidth, imgHeight);
                     const filename = 'vehicle_selected_tracking.pdf';
-                    try {
-                        window.open(pdf.output('bloburl', { filename: filename }))
-                    } catch (error) {
-                        pdf.save(filename);
-                    }
+                    pdf.save(filename);
                 })
 
             });
@@ -423,11 +418,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
         const filename = 'vehicle_tracking_data.pdf';
-        try {
-            window.open(doc.output('bloburl', { filename: filename }))
-        } catch (error) {
-            doc.save(filename);
-        }
+        doc.save(filename);
+
     }
 
     // Agregar evento al botón de descarga de PDF
