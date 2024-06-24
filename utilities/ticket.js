@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const { data: records, error } = await database
             .from('ticket')
             .select('*')
-            .eq('sessionID', sessionID)
+            .eq('tempuser', sessionID)
             .order('created_at', { ascending: false })
             .limit(5);
 
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const fullNameCell = document.createElement('td');
         fullNameCell.textContent = fullName;
         fullNameCell.classList.add('fullnameSelect', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
-        fullNameCell.style.maxWidth = '80px';
+        fullNameCell.style.maxWidth = '150px';
         fullNameCell.style.overflow = 'hidden';
         fullNameCell.style.textOverflow = 'ellipsis';
 
@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
         subjectLink.textContent = subject;
         subjectLink.classList.add('subjectSelect', 'hover:underline', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-sky-500', 'dark:text-sky-400');
         subjectCell.appendChild(subjectLink);
-        subjectCell.style.maxWidth = '50px';
+        subjectCell.style.maxWidth = '150px';
         subjectCell.style.overflow = 'hidden';
         subjectCell.style.textOverflow = 'ellipsis';
 
@@ -258,7 +258,15 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             const { data: insertedData, error } = await database
                 .from('ticket')
-                .insert([{ fullName, priority, subject, description, sessionID }])
+                .insert([
+                    {
+                        fullName: fullName,
+                        priority: priority,
+                        subject: subject,
+                        description: description,
+                        tempuser: sessionID
+                    }
+                ])
                 .select('*');
 
             if (error) {
@@ -392,7 +400,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Configurar estilos y título
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
-        doc.text('Vehicle Tracking Data', 14, 22);
+        doc.text('Ticket Data', 14, 22);
         doc.setFontSize(12);
         doc.setFont('helvetica', 'normal');
         doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
@@ -425,7 +433,7 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.autoPrint();
 
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
-        const filename = 'vehicle_tracking_data.pdf';
+        const filename = 'ticket_data.pdf';
         try {
             window.open(doc.output('bloburl', { filename: filename }))
         } catch (error) {
@@ -447,7 +455,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Configurar estilos y título
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text('Vehicle Tracking Data', 14, 22);
+        doc.text('Ticket Data', 14, 22);
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
@@ -489,7 +497,7 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.autoPrint();
 
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
-        const filename = 'vehicle_tracking_data.pdf';
+        const filename = 'ticket_data.pdf';
         try {
             window.open(doc.output('bloburl', { filename: filename }));
         } catch (error) {
@@ -507,7 +515,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Crear un libro de Excel
         var workbook = XLSX.utils.book_new();
         // Crear una hoja de cálculo
-        var sheetData = [['Vehicle Tracking Data'],
+        var sheetData = [['Ticket Data'],
         ['Gilberto Fontanez A Software Developer Report'],
         [' '], ['Full Name', 'Subject', 'Priority', 'Description']];
         var tableBody = document.getElementById('tbobyTicket');
@@ -525,9 +533,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         var ws = XLSX.utils.aoa_to_sheet(sheetData);
         // Agregar la hoja al libro
-        XLSX.utils.book_append_sheet(workbook, ws, 'Vehicle Tracking Data');
+        XLSX.utils.book_append_sheet(workbook, ws, 'Ticket Data');
         // Guardar el archivo de Excel
-        XLSX.writeFile(workbook, 'vehicle_tracking_data.xlsx');
+        XLSX.writeFile(workbook, 'ticket_data.xlsx');
     }
 
     // Agregar evento al botón de descarga de Excel
