@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch('https://retro.umoiq.com/service/publicXMLFeed?command=agencyList');
             const data = await response.text();
             const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
-            agencyTag = xmlDoc.getElementsByTagName('agency')[6].getAttribute('tag');
+            agencyTag = xmlDoc.getElementsByTagName('agency')[0].getAttribute('tag');
             // Escoje el 0, 27, 6, quizas 1
 
             const routeListResponse = await fetch(`https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=${agencyTag}`);
@@ -303,12 +303,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 L.DomUtil.get('trackingSelectedMap')._leaflet_id = null;
             }
 
-            const popupContent = `<b>Vehicle:</b> ${vehicleSelect} <br><b>Address:</b> ${addressSelect} <br>`;
+            const popupContent = `<b>Vehicle:</b> ${vehicleSelect} <br><b>Address:</b> ${addressSelect} <br> <b> ${coordinates} </b> <br>`;
             selectedMap = L.map('trackingSelectedMap').setView([coordinatesSelect[0], coordinatesSelect[1]], 18);
             console.log('selectedMap coordinates:', coordinatesSelect);
             const tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png';
             L.tileLayer(tileUrl, {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                maxZoom: 18,
+                minZoom: 18,
+                scrollWheel: false,
+                zoom: false,
+                touch: false,
+                click: false,
+                mousedown: false,
+                mouseup: false,
+                mouse: false,
+                scrollWheelZoom: false
             }).addTo(selectedMap);
             L.marker([coordinatesSelect[0], coordinatesSelect[1]]).addTo(selectedMap).bindPopup(popupContent).openPopup();
 
@@ -317,6 +326,49 @@ document.addEventListener("DOMContentLoaded", function () {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF();
                 const trackingSelectedMap = document.getElementById('trackingSelectedMap');
+
+                // Configurar estilos y título
+                pdf.setFontSize(18);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Vehicle Position Data', 14, 22);
+                pdf.setFontSize(12);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text('Gilberto Fontanez A Software Developer Report', 14, 28);
+
+                pdf.setFontSize(12);
+                let y = 44; // Posición inicial en Y
+
+                // Agregar encabezados con estilo
+                pdf.setDrawColor(0); // Color del borde (negro)
+                pdf.setFillColor(200); // Color de fondo (gris claro)
+                pdf.setLineWidth(0.1); // Ancho del borde
+
+                pdf.rect(10, y, 70, 10, 'FD'); // Rectángulo para 'Time'
+                pdf.rect(74, y, 20, 10, 'FD'); // Rectángulo para 'Vehicle'
+                pdf.rect(94, y, 80, 10, 'FD'); // Rectángulo para 'Address'
+                pdf.rect(174, y, 30, 10, 'FD'); // Rectángulo para 'Speed'
+                pdf.rect(10, y + 30, 63, 10, 'FD'); // Rectángulo para 'Coordinates'
+
+                pdf.setFontSize(10);
+                pdf.text('Time', 14, y + 6); // Texto para 'Time'
+                pdf.text('Vehicle', 78, y + 6); // Texto para 'Vehicle'
+                pdf.text('Address', 100, y + 6); // Texto para 'Address'
+                pdf.text('Speed', 178, y + 6); // Texto para 'Speed'
+                pdf.text('Satellite Screenshot', 14, y + 36); // Texto para 'Coordinates'
+
+                y += 20;
+
+                // Agregar los datos del formulario al PDF
+                const time = document.getElementById('timestamp').value;
+                const speed = document.getElementById('speed').value;
+                pdf.text(time, 12, y);
+                pdf.text(vehicleSelect, 78, y);
+                pdf.text(addressSelect, 100, y);
+                pdf.text(speed, 178, y);
+
+                pdf.text('Position is based on coordinates:', 14, y + 30);
+                pdf.text(coordinates, 68, y + 30);
+
                 html2canvas(trackingSelectedMap, {
                     logging: true,
                     scale: 1,
@@ -326,8 +378,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     const imgWidth = 130;
                     const imgHeight = canvas.height * imgWidth / canvas.width;
                     const imgData = canvas.toDataURL('image/png');
-                    pdf.addImage(imgData, 'PNG', 5, 10, imgWidth, imgHeight);
-                    const filename = 'vehicle_selected_tracking.pdf';
+                    pdf.addImage(imgData, 'PNG', 14, y + 35, imgWidth, imgHeight);
+                    const filename = 'vehicle_selected_data.pdf';
                     pdf.save(filename);
                 })
 
@@ -392,13 +444,16 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.setFillColor(200); // Color de fondo (gris claro)
         doc.setLineWidth(0.1); // Ancho del borde
 
-        doc.rect(14, y, 56, 10, 'FD'); // Rectángulo para 'Vehicle'
-        doc.rect(70, y, 70, 10, 'FD'); // Rectángulo para 'Position'
-        doc.rect(140, y, 50, 10, 'FD'); // Rectángulo para 'Speed'
+        doc.rect(14, y, 60, 10, 'FD'); // Rectángulo para 'Time'
+        doc.rect(74, y, 50, 10, 'FD'); // Rectángulo para 'Vehicle'
+        doc.rect(94, y, 80, 10, 'FD'); // Rectángulo para 'Address'
+        doc.rect(174, y, 30, 10, 'FD'); // Rectángulo para 'Speed'
 
-        doc.text('Vehicle', 18, y + 6); // Texto para 'Vehicle'
-        doc.text('Address', 74, y + 6); // Texto para 'Position'
-        doc.text('Speed', 144, y + 6); // Texto para 'Speed'
+        doc.setFontSize(10);
+        doc.text('Time', 18, y + 6); // Texto para 'Time'
+        doc.text('Vehicle', 78, y + 6); // Texto para 'Vehicle'
+        doc.text('Address', 100, y + 6); // Texto para 'Address'
+        doc.text('Speed', 178, y + 6); // Texto para 'Speed'
 
         y += 20;
 
@@ -406,20 +461,18 @@ document.addEventListener("DOMContentLoaded", function () {
         rows.forEach((row, index) => {
             const cols = row.querySelectorAll('td');
             if (cols.length > 0) {
-                doc.text(cols[0].textContent, 22, y);
-                doc.text(cols[1].textContent, 74, y);
-                doc.text(cols[2].textContent, 146, y);
+                // doc.text(22, y, 30, 10, cols[0].textContent, null, null, null, null, 'left');
+                doc.text(cols[0].textContent, 18, y);
+                doc.text(cols[1].textContent, 78, y);
+                doc.text(cols[2].textContent, 100, y);
+                doc.text(cols[3].textContent, 178, y);
                 y += 10;
             }
         });
 
-        // Configurar la acción de impresión automática
-        doc.autoPrint();
-
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
         const filename = 'vehicle_tracking_data.pdf';
-        doc.save(filename);
-
+        doc.output('dataurlnewwindow', { filename });
     }
 
     // Agregar evento al botón de descarga de PDF
@@ -434,7 +487,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Crear una hoja de cálculo
         var sheetData = [['Vehicle Tracking Data'],
         ['Gilberto Fontanez A Software Developer Report'],
-        [' '], ['Vehicle', 'Address', 'Speed']];
+        [' '], ['Time', 'Vehicle', 'Address', 'Speed']];
         var tableBody = document.getElementById('vehicleData');
         var rows = tableBody.querySelectorAll('tr');
         rows.forEach((row, index) => {
@@ -443,7 +496,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 sheetData.push([
                     cols[0].textContent,
                     cols[1].textContent,
-                    cols[2].textContent
+                    cols[2].textContent,
+                    cols[3].textContent
                 ]);
             }
         });

@@ -204,13 +204,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     commentSection.appendChild(commentList);
                 } else {
                     const noCommentsMsg = document.createElement('div');
-                    noCommentsMsg.textContent = 'No hay comentarios';
+                    noCommentsMsg.textContent = 'No Comments';
                     noCommentsMsg.classList.add('bg-slate-300', 'dark:bg-slate-600', 'rounded', 'm-2', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
                     commentSection.appendChild(noCommentsMsg);
                 }
             } else {
                 const noCommentsMsg = document.createElement('div');
-                noCommentsMsg.textContent = 'No hay comentarios';
+                noCommentsMsg.textContent = 'No Comments';
                 noCommentsMsg.classList.add('bg-slate-300', 'dark:bg-slate-600', 'rounded', 'm-2', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
                 commentSection.appendChild(noCommentsMsg);
             }
@@ -395,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Obtener los comentarios
         const commentList = ticketForm.querySelector('#readcomments ul');
-        const comments = Array.from(commentList.querySelectorAll('li')).map(li => li.textContent);
+        const comments = commentList ? Array.from(commentList.querySelectorAll('li')).map(li => li.textContent) : 'No Comments';
 
         // Configurar estilos y título
         doc.setFontSize(18);
@@ -429,16 +429,10 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.text(comments, 60, y);
         y += 10;
 
-        // Configurar la acción de impresión automática
-        doc.autoPrint();
-
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
         const filename = 'ticket_data.pdf';
-        try {
-            window.open(doc.output('bloburl', { filename: filename }))
-        } catch (error) {
-            doc.save(filename);
-        }
+        doc.output('dataurlnewwindow', { filename });
+
     }
     // Agregar evento al botón de descarga de PDF
     const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');

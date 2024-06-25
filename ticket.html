@@ -176,10 +176,10 @@
         <div class="relative p-4 w-4/6 max-sm:w-full max-h-full">
             <!-- Modal content -->
             <div
-                class="relative bg-white rounded-lg shadow-xl shadow-gray-700/100 max-sm:shadow-lg max-sm:shadow-gray-700/100 dark:bg-gray-800">
+                class="bg-white relative rounded-lg shadow shadow-gray-700/50 max-sm:shadow max-sm:shadow-gray-700/50 dark:bg-gray-800">
                 <!-- Modal header -->
                 <div
-                    class="flex items-center justify-between p-4 md:p-5 border-b border-gray-200 rounded-t bg-white dark:bg-gray-900 dark:border-gray-600">
+                    class="flex items-center justify-between p-4 md:p-5 border-b border-gray-200 rounded-t bg-gray-100 dark:bg-gray-700 dark:border-gray-600">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="modalTitle">
 
                     </h3>
@@ -195,7 +195,7 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div class="p-4 md:p-5 space-y-4">
+                <div class="p-4 md:p-5 space-y-4 dark:bg-gray-900">
                     <form id="ticketForm">
                         <div class="mb-4">
                             <label for="fullName"
@@ -244,9 +244,9 @@
                 </div>
                 <!-- Modal footer -->
                 <div
-                    class="flex justify-end p-4 md:p-5 border-t border-gray-200 rounded-b dark:bg-gray-900 dark:border-gray-600">
+                    class="flex justify-end p-4 md:p-5 border-t bg-gray-100 border-gray-200 rounded-b dark:bg-gray-700 dark:border-gray-600">
                     <button id="downloadTicketPdfBtn"
-                        class="hidden items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+                        class="hidden items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto bg-white hover:bg-gray-200 focus:ring-4 focus:ring-gray-100 dark:text-white dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-800">
                         <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="red">
                             <path
                                 d="M369.9 97.9 286 14C277.7 5.7 266.1 0 253.5 0H160c-26.5 0-48 21.5-48 48v112H48c-26.5 0-48 21.5-48 48v208c0 26.5 21.5 48 48 48h48v32c0 26.5 21.5 48 48 48h208c26.5 0 48-21.5 48-48V142.5c0-12.6-5.1-24.7-14.1-33.6zM259.5 41.9 335 117.5h-59.5c-8.8 0-16-7.2-16-16V41.9zm76.5 426.1c0 8.8-7.2 16-16 16H160c-8.8 0-16-7.2-16-16v-32h139.7c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9H176v-32h56c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9h-56v-32h96c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9h-96V96c0-8.8 7.2-16 16-16h80v56c0 26.5 21.5 48 48 48h48v288zm-240-208v208c0 8.8-7.2 16-16 16H48c-8.8 0-16-7.2-16-16V224c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16zm32 136v-16c0-4.4 3.6-8 8-8h5.6c6.9 0 13.5 3.6 17.1 9.5l7.7 12.3c2.9 4.7 9.7 4.7 12.6 0l7.7-12.3c3.6-5.9 10.1-9.5 17.1-9.5H192c4.4 0 8 3.6 8 8v16c0 4.4-3.6 8-8 8h-5.6c-6.9 0-13.5-3.6-17.1-9.5l-7.7-12.3c-2.9-4.7-9.7-4.7-12.6 0l-7.7 12.3c-3.6 5.9-10.1 9.5-17.1 9.5H136c-4.4 0-8-3.6-8-8zm152-64v16c0 4.4-3.6 8-8 8h-80c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h80c4.4 0 8 3.6 8 8z" />

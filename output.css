@@ -822,14 +822,6 @@ video {
   margin-top: .15rem;
 }
 
-.mt-0 {
-  margin-top: 0px;
-}
-
-.mt-1 {
-  margin-top: 0.25rem;
-}
-
 .box-border {
   box-sizing: border-box;
 }
@@ -2325,10 +2317,6 @@ video {
   padding-top: 2rem;
 }
 
-.pt-4 {
-  padding-top: 1rem;
-}
-
 .text-left {
   text-align: left;
 }
@@ -2767,14 +2755,8 @@ video {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-.shadow-xl {
-  --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-.shadow-gray-700\/100 {
-  --tw-shadow-color: rgb(55 65 81 / 1);
+.shadow-gray-700\/50 {
+  --tw-shadow-color: rgb(55 65 81 / 0.5);
   --tw-shadow: var(--tw-shadow-colored);
 }
 
@@ -2816,11 +2798,6 @@ video {
 
 .drop-shadow {
   --tw-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
-}
-
-.drop-shadow-lg {
-  --tw-drop-shadow: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
@@ -3127,6 +3104,14 @@ element::-webkit-scrollbar {
     margin-bottom: 3.5rem;
   }
 
+  .max-sm\:mb-4 {
+    margin-bottom: 1rem;
+  }
+
+  .max-sm\:mb-6 {
+    margin-bottom: 1.5rem;
+  }
+
   .max-sm\:mt-1 {
     margin-top: 0.25rem;
   }
@@ -3137,10 +3122,6 @@ element::-webkit-scrollbar {
 
   .max-sm\:mt-3 {
     margin-top: 0.75rem;
-  }
-
-  .max-sm\:mb-6 {
-    margin-bottom: 1.5rem;
   }
 
   .max-sm\:hidden {
@@ -3171,14 +3152,14 @@ element::-webkit-scrollbar {
     padding-top: 2rem;
   }
 
-  .max-sm\:shadow-lg {
-    --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+  .max-sm\:shadow {
+    --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   }
 
-  .max-sm\:shadow-gray-700\/100 {
-    --tw-shadow-color: rgb(55 65 81 / 1);
+  .max-sm\:shadow-gray-700\/50 {
+    --tw-shadow-color: rgb(55 65 81 / 0.5);
     --tw-shadow: var(--tw-shadow-colored);
   }
 }
@@ -3242,10 +3223,6 @@ element::-webkit-scrollbar {
 @media (min-width: 768px) {
   .md\:inset-0 {
     inset: 0px;
-  }
-
-  .md\:mt-0 {
-    margin-top: 0px;
   }
 
   .md\:p-5 {
