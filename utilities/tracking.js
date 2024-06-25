@@ -55,19 +55,32 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch('https://retro.umoiq.com/service/publicXMLFeed?command=agencyList');
             const data = await response.text();
             const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
-            agencyTag = xmlDoc.getElementsByTagName('agency')[0].getAttribute('tag');
-            // Escoje el 0, 27, 6, quizas 1
-
-            const routeListResponse = await fetch(`https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=${agencyTag}`);
-            const routeListData = await routeListResponse.text();
-            const routeXmlDoc = new DOMParser().parseFromString(routeListData, "text/xml");
-            const routes = routeXmlDoc.getElementsByTagName('route');
+            const defaultAgencies = ['jhu-apl', 'ccrta', 'chapel-hill', 'dumbarton-gtfs'];
+            // Other default agencies: 'ttc',
 
             let routeListToHTML = '';
-            for (let i = 0; i < routes.length; i++) {
-                const routeTag = routes[i].getAttribute('tag');
-                const routeTitle = routes[i].getAttribute('title');
-                routeListToHTML += `<option value="${routeTag}">${routeTitle}</option>`;
+
+            for (const agency of defaultAgencies) {
+                // Obtener el tag de la agencia actual
+                const agencyElement = Array.from(xmlDoc.getElementsByTagName('agency')).find(el => el.getAttribute('tag') === agency);
+                if (!agencyElement) {
+                    console.warn(`Agency with tag ${agency} not found.`);
+                    continue;
+                }
+                const agencyTag = agencyElement.getAttribute('tag');
+                console.log('agencyTag:', agencyTag);
+
+                // Obtener la lista de rutas para la agencia actual
+                const routeListResponse = await fetch(`https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=${agencyTag}`);
+                const routeListData = await routeListResponse.text();
+                const routeXmlDoc = new DOMParser().parseFromString(routeListData, "text/xml");
+                const routes = routeXmlDoc.getElementsByTagName('route');
+
+                for (let I = 0; I < routes.length; I++) {
+                    const routeTag = routes[I].getAttribute('tag');
+                    const routeTitle = routes[I].getAttribute('title');
+                    routeListToHTML += `<option value="${routeTag}" data-agency="${agencyTag}">${routeTitle}</option>`;
+                }
             }
 
             return { routeListToHTML };
@@ -77,53 +90,73 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Función para obtener las ubicaciones de los vehículos
+    // Event listener para el cambio de selección de ruta
+    routeList.addEventListener('change', async (event) => {
+        selectedRouteTag = event.target.value;
+        agencyTag = event.target.selectedOptions[0].getAttribute('data-agency');
+        await fetchVehicleLocations();
+    });
+
+    // Función para obtener las ubicaciones de los vehículos para la ruta seleccionada
     async function fetchVehicleLocations() {
-        const vehicleLocationUrl = `https://retro.umoiq.com/service/publicXMLFeed?command=vehicleLocations&a=${agencyTag}&r=${selectedRouteTag}&t=${lastTime}`;
-        const response = await fetch(vehicleLocationUrl);
-        const data = await response.text();
-        const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
-
-        const vehicles = xmlDoc.getElementsByTagName('vehicle');
-        let vehicleListToHTML = '';
-        if (vehicles.length > 0) {
-            vehicleListToHTML = '<option value="">Select Vehicle...</option>';
-            for (let i = 0; i < vehicles.length; i++) {
-                const vehicle = vehicles[i];
-                const id = vehicle.getAttribute('id');
-                const lat = vehicle.getAttribute('lat');
-                const lon = vehicle.getAttribute('lon');
-                vehicleListToHTML += `<option value="${id}">${id}</option>`;
-
-                // Actualizar o crear marcadores para cada vehículo
-                if (markers[id]) {
-                    markers[id].setLatLng([lat, lon]);
-                } else {
-                    markers[id] = L.marker([lat, lon]).addTo(map);
-                }
-            }
-        } else {
-            vehicleListToHTML = '<option value="">No vehicles in use. Please check another route.</option>';
+        if (!selectedRouteTag || !agencyTag) {
+            console.warn('Route or agency tag not selected.');
+            return;
         }
-        vehicleList.innerHTML = vehicleListToHTML;
 
-        // Actualizar el último tiempo (lastTime)
-        // lastTime se utiliza como request para almacenar el tiempo de la última actualización de los datos por ruta y reducir el uso de ancho de banda
-        const lastTimeElement = xmlDoc.getElementsByTagName('lastTime')[0];
-        if (lastTimeElement) {
-            lastTime = lastTimeElement.getAttribute('time');
+        try {
+            const vehicleLocationUrl = `https://retro.umoiq.com/service/publicXMLFeed?command=vehicleLocations&a=${agencyTag}&r=${selectedRouteTag}&t=${lastTime}`;
+            const response = await fetch(vehicleLocationUrl);
+            const data = await response.text();
+            const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
+
+            const vehicles = xmlDoc.getElementsByTagName('vehicle');
+            let vehicleListToHTML = '';
+            if (vehicles.length > 0) {
+                vehicleListToHTML = '<option value="">Select Vehicle...</option>';
+                for (let i = 0; i < vehicles.length; i++) {
+                    const vehicle = vehicles[i];
+                    const id = vehicle.getAttribute('id');
+                    const lat = vehicle.getAttribute('lat');
+                    const lon = vehicle.getAttribute('lon');
+                    vehicleListToHTML += `<option value="${id}">${id}</option>`;
+
+                    // Actualizar o crear marcadores para cada vehículo
+                    if (markers[id]) {
+                        markers[id].setLatLng([lat, lon]);
+                    } else {
+                        markers[id] = L.marker([lat, lon]).addTo(map);
+                    }
+                }
+            } else {
+                vehicleListToHTML = '<option value="">No vehicles in use. Check another Route.</option>';
+            }
+            vehicleList.innerHTML = vehicleListToHTML;
+
+            // Actualizar el último tiempo (lastTime)
+            const lastTimeElement = xmlDoc.getElementsByTagName('lastTime')[0];
+            if (lastTimeElement) {
+                lastTime = lastTimeElement.getAttribute('time');
+            }
+        } catch (error) {
+            console.error('Error fetching vehicle locations:', error);
         }
     }
 
+    // Función para obtener la ubicación del vehículo seleccionado
     async function fetchSelectedVehicleLocation() {
-        if (selectedVehicleId && agencyTag) {
+        if (!selectedVehicleId || !agencyTag) {
+            console.warn('Vehicle or agency tag not selected.');
+            return;
+        }
+
+        try {
             const vehicleLocationUrl = `https://retro.umoiq.com/service/publicXMLFeed?command=vehicleLocation&a=${agencyTag}&v=${selectedVehicleId}`;
             const response = await fetch(vehicleLocationUrl);
             const data = await response.text();
             const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
 
             const vehicle = xmlDoc.getElementsByTagName('vehicle')[0];
-            console.log('Pase por aqui:');
 
             if (vehicle) {
                 const lat = parseFloat(vehicle.getAttribute('lat'));
@@ -179,6 +212,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     tableCounter++;
                 }
             }
+        } catch (error) {
+            console.error('Error fetching selected vehicle location:', error);
         }
     }
 
