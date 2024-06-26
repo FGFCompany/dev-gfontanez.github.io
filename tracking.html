@@ -78,7 +78,10 @@
                     <h2 class="mb-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Tracking</h2>
                     <!-- List -->
                     <ul role="list"
-                        class="pt-3 max-sm:pt-8 mb-4 space-y-5 border-t border-gray-200 dark:border-gray-700">
+                        class="pt-3 max-sm:pt-8 mb-8 space-y-5 border-t border-gray-200 dark:border-gray-700">
+                        <!-- Map -->
+                        <div class="h-[30rem] max-sm:h-[20rem] max-sm:mb-8 rounded mt-2 mb-4 z-0" id="map"></div>
+
                         <li class="flex space-x-3">
                             <!-- Icon -->
                             <svg class="invisible flex-shrink-0 w-5 h-5 mt-[.15rem] max-sm:mt-1.5 text-emerald-500 dark:text-emerald-400"
@@ -111,37 +114,36 @@
                                 2: </span>
                             <!-- Select -->
                             <select id="vehicleTag"
-                                class="mb-4 pl-2 text-lg block w-full font-medium text-gray-900 bg-transparent border border-gray-200 rounded focus:outline-none hover:bg-gray-100 hover:text-emerald-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                                class="max-sm:mb-8 pl-2 text-lg block w-full font-medium text-gray-900 bg-transparent border border-gray-200 rounded focus:outline-none hover:bg-gray-100 hover:text-emerald-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                                 <option value="">Select Vehicle...</option>
                             </select>
                         </li>
                     </ul>
 
-                    <!-- Map -->
-                    <div class="h-[30rem] max-sm:h-[20rem] max-sm:mb-14 rounded mb-4 z-0" id="map"></div>
                     <p class="max-sm:hidden mb-4 font-light lg:text-xl">Provide excellent service experiences quickly.
                         Speed up
                         essential development tasks, reduce repetitive work, and implement changes effortlessly.</p>
                     <p class="max-sm:hidden mb-8 font-light lg:text-xl">Deliver great service experiences - without the
                         complexity of traditional solutions.</p>
                 </div>
-                <!-- <img class="hidden w-full mb-4 rounded-lg lg:mb-0 lg:flex" src="./images/feature-1.png"
-                    alt="dashboard feature image"> -->
 
                 <div class="text-gray-500 sm:text-lg dark:text-gray-400">
                     <h2 class="mb-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Tracking
                         Report</h2>
-                    <div class="mb-4 border-t border-gray-200 dark:border-gray-700"></div>
+                    <div class="mb-4 max-sm:mb-10 border-t border-gray-200 dark:border-gray-700"></div>
                     <p class="max-sm:hidden mb-4 font-light lg:text-xl">The tracking report is limited for cost and demo
                         purposes.
                         Real-time data is gathered only when a vehicle is selected, then inserted into the database to
                         generate a real-time report.</p>
                     <!-- Generate Report -->
-                    <section class="mb-6 rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 overflow-x-auto">
+                    <section
+                        class="mb-6 rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 overflow-x-auto">
                         <div class="max-w-screen-lg">
+                            <div
+                                class="max-sm:min-h-40 max-sm:max-h-80 min-h-[550px] max-h-[600px] rounded-b overflow-y-auto">
                                 <table class="min-w-full border-collapse">
                                     <thead
-                                        class="bg-gray-50 border-b border-gray-300 dark:bg-gray-700 dark:border-gray-600">
+                                        class="sticky top-0 drop-shadow-md bg-gray-100 dark:bg-gray-700 dark:shadow-white">
                                         <tr>
                                             <th scope="col"
                                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
@@ -165,6 +167,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
                         </div>
                     </section>
                     <!-- Extras -->
@@ -176,7 +179,7 @@
                                 <path
                                     d="M369.9 97.9 286 14C277.7 5.7 266.1 0 253.5 0H160c-26.5 0-48 21.5-48 48v112H48c-26.5 0-48 21.5-48 48v208c0 26.5 21.5 48 48 48h48v32c0 26.5 21.5 48 48 48h208c26.5 0 48-21.5 48-48V142.5c0-12.6-5.1-24.7-14.1-33.6zM259.5 41.9 335 117.5h-59.5c-8.8 0-16-7.2-16-16V41.9zm76.5 426.1c0 8.8-7.2 16-16 16H160c-8.8 0-16-7.2-16-16v-32h139.7c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9H176v-32h56c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9h-56v-32h96c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9h-96V96c0-8.8 7.2-16 16-16h80v56c0 26.5 21.5 48 48 48h48v288zm-240-208v208c0 8.8-7.2 16-16 16H48c-8.8 0-16-7.2-16-16V224c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16zm32 136v-16c0-4.4 3.6-8 8-8h5.6c6.9 0 13.5 3.6 17.1 9.5l7.7 12.3c2.9 4.7 9.7 4.7 12.6 0l7.7-12.3c3.6-5.9 10.1-9.5 17.1-9.5H192c4.4 0 8 3.6 8 8v16c0 4.4-3.6 8-8 8h-5.6c-6.9 0-13.5-3.6-17.1-9.5l-7.7-12.3c-2.9-4.7-9.7-4.7-12.6 0l-7.7 12.3c-3.6 5.9-10.1 9.5-17.1 9.5H136c-4.4 0-8-3.6-8-8zm152-64v16c0 4.4-3.6 8-8 8h-80c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h80c4.4 0 8 3.6 8 8z" />
                             </svg>
-                            Generate PDF
+                            Tracking Report PDF
                         </button>
                         <button id="downloadExcelBtn"
                             class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
@@ -185,7 +188,7 @@
                                 <path
                                     d="M438.6 160H416V64c0-35.35-28.65-64-64-64H96C60.65 0 32 28.65 32 64v96H9.4C4.176 160 0 164.2 0 169.4V192c0 4.375 4.375 9.594 9.4 9.594H32v160H9.4C4.176 361.6 0 365.8 0 371V393.4C0 398.6 4.176 403.8 9.4 403.8H32v44.2C32 484.2 60.65 512 96 512H352c35.35 0 64-28.65 64-64v-44.2h22.6c5.225 0 9.4-4.199 9.4-9.4V371c0-4.375-4.375-9.594-9.4-9.594H416V201.6h22.6c5.225 0 9.4-4.199 9.4-9.4V169.4C448 164.2 443.8 160 438.6 160zM96 48h256c8.836 0 16 7.164 16 16v96H80V64C80 55.16 87.16 48 96 48zM32 170.4H416V192H32V170.4zM32 361.6H416V393.4H32V361.6zM416 448c0 8.836-7.164 16-16 16H96c-8.836 0-16-7.164-16-16v-44.2h336V448zM256 324h-16v56H160v-56h-16V288h112V324zM224 288h-64v32h64V288zM368 324H320v16h32v16H320v16h48V324zM272 352H240V320H208v32H160V320H112v32H80v-48h192v48H272z" />
                             </svg>
-                            Generate Excel
+                            Tracking Report Excel
                         </button>
                     </div>
 
@@ -251,6 +254,14 @@
                 <!-- Modal body -->
                 <div class="p-4 md:p-5 space-y-4 dark:bg-gray-900">
                     <form id="ticketForm">
+                        <!-- Map -->
+                        <div class="mb-2">
+                            <label for="trackingSelectedMap"
+                                class="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Satellite
+                                Screenshot</label>
+                            <div class="h-[30rem] max-sm:h-[20rem] max-sm:mb-4 rounded mb-4" id="trackingSelectedMap">
+                            </div>
+                        </div>
                         <div class="mb-4">
                             <label for="vehicle"
                                 class="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Vehicle</label>
@@ -286,12 +297,6 @@
                                 class="w-full p-2 bg-gray-100 border border-gray-300 rounded text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 readonly>
                         </div>
-                        <!-- Map -->
-                        <div class="mb-2">
-                            <label for="trackingSelectedMap"
-                                class="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Satellite Screenshot</label>
-                                <div class="h-[30rem] max-sm:h-[20rem] max-sm:mb-4 rounded mb-4" id="trackingSelectedMap"></div>
-                        </div>
                     </form>
                 </div>
                 <!-- Modal footer -->
@@ -303,7 +308,7 @@
                             <path
                                 d="M369.9 97.9 286 14C277.7 5.7 266.1 0 253.5 0H160c-26.5 0-48 21.5-48 48v112H48c-26.5 0-48 21.5-48 48v208c0 26.5 21.5 48 48 48h48v32c0 26.5 21.5 48 48 48h208c26.5 0 48-21.5 48-48V142.5c0-12.6-5.1-24.7-14.1-33.6zM259.5 41.9 335 117.5h-59.5c-8.8 0-16-7.2-16-16V41.9zm76.5 426.1c0 8.8-7.2 16-16 16H160c-8.8 0-16-7.2-16-16v-32h139.7c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9H176v-32h56c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9h-56v-32h96c17 0 30.8-14.1 30.3-31.1.4-16.6-13.4-30.9-30-30.9h-96V96c0-8.8 7.2-16 16-16h80v56c0 26.5 21.5 48 48 48h48v288zm-240-208v208c0 8.8-7.2 16-16 16H48c-8.8 0-16-7.2-16-16V224c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16zm32 136v-16c0-4.4 3.6-8 8-8h5.6c6.9 0 13.5 3.6 17.1 9.5l7.7 12.3c2.9 4.7 9.7 4.7 12.6 0l7.7-12.3c3.6-5.9 10.1-9.5 17.1-9.5H192c4.4 0 8 3.6 8 8v16c0 4.4-3.6 8-8 8h-5.6c-6.9 0-13.5-3.6-17.1-9.5l-7.7-12.3c-2.9-4.7-9.7-4.7-12.6 0l-7.7 12.3c-3.6 5.9-10.1 9.5-17.1 9.5H136c-4.4 0-8-3.6-8-8zm152-64v16c0 4.4-3.6 8-8 8h-80c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h80c4.4 0 8 3.6 8 8z" />
                         </svg>
-                        Venicle Report PDF
+                        Vehicle Report PDF
                     </button>
                 </div>
             </div>

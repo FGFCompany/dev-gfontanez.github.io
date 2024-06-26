@@ -90,13 +90,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Event listener para el cambio de selección de ruta
-    routeList.addEventListener('change', async (event) => {
-        selectedRouteTag = event.target.value;
-        agencyTag = event.target.selectedOptions[0].getAttribute('data-agency');
-        await fetchVehicleLocations();
-    });
-
     // Función para obtener las ubicaciones de los vehículos para la ruta seleccionada
     async function fetchVehicleLocations() {
         if (!selectedRouteTag || !agencyTag) {
@@ -220,16 +213,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function insertVehicleData(vehicle, positionGeocoded, speed, created_at, id) {
         const tableBody = document.getElementById('vehicleData');
-
         // Remove "No data available" row if it exists
         const noDataRow = document.getElementById('noDataRow');
         if (noDataRow) {
             noDataRow.remove();
         }
-
         // Create new row with vehicle data
         const newRow = document.createElement('tr');
-
         const vehicleCell = document.createElement('td');
         const vehicleLink = document.createElement('a');
         vehicleLink.textContent = vehicle;
@@ -281,32 +271,32 @@ document.addEventListener("DOMContentLoaded", function () {
     function addRowClickListeners() {
         document.querySelectorAll('tr').forEach(row => {
             // Remover cualquier evento de clic existente
-            row.removeEventListener('click', rowTrackingSelected);
+            row.removeEventListener('click', rowSelectedVehicle);
 
             // Agregar el nuevo evento de clic
-            row.addEventListener('click', rowTrackingSelected);
+            row.addEventListener('click', rowSelectedVehicle);
         });
     }
 
     // Función manejadora del evento de clic en las filas
-    async function rowTrackingSelected(event) {
+    async function rowSelectedVehicle(event) {
         selectedRow = event.currentTarget; // Guardar la fila seleccionada
         console.log('Selected row:', selectedRow);
         const idSelect = selectedRow.querySelector('.idSelect').value;
         console.log('idSelect:', idSelect);
-        const { data: rowTrackingSelected, error } = await database
+        const { data: rowSelectedVehicle, error } = await database
             .from('tracking')
             .select('*')
             .eq('id', idSelect);
         if (error) {
             console.error(error);
         } else {
-            const vehicleSelect = rowTrackingSelected[0].vehicle;
-            const coordinatesSelect = JSON.parse(rowTrackingSelected[0].position);
+            const vehicleSelect = rowSelectedVehicle[0].vehicle;
+            const coordinatesSelect = JSON.parse(rowSelectedVehicle[0].position);
             console.log('coordinatesSelect:', coordinatesSelect);
-            const addressSelect = rowTrackingSelected[0].positionGeocoded;
-            const speedSelect = rowTrackingSelected[0].speed;
-            const timestampSelect = rowTrackingSelected[0].created_at;
+            const addressSelect = rowSelectedVehicle[0].positionGeocoded;
+            const speedSelect = rowSelectedVehicle[0].speed;
+            const timestampSelect = rowSelectedVehicle[0].created_at;
             // Mostrar el modal con id "static-modal"
             const modal = document.getElementById('static-modal');
             modal.style.display = 'flex';
@@ -356,84 +346,23 @@ document.addEventListener("DOMContentLoaded", function () {
             }).addTo(selectedMap);
             L.marker([coordinatesSelect[0], coordinatesSelect[1]]).addTo(selectedMap).bindPopup(popupContent).openPopup();
 
-
-            trackingSelectedPdfBtn.addEventListener('click', () => {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF();
-                const trackingSelectedMap = document.getElementById('trackingSelectedMap');
-
-                // Configurar estilos y título
-                pdf.setFontSize(18);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Vehicle Position Data', 14, 22);
-                pdf.setFontSize(12);
-                pdf.setFont('helvetica', 'normal');
-                pdf.text('Gilberto Fontanez A Software Developer Report', 14, 28);
-
-                pdf.setFontSize(12);
-                let y = 44; // Posición inicial en Y
-
-                // Agregar encabezados con estilo
-                pdf.setDrawColor(0); // Color del borde (negro)
-                pdf.setFillColor(200); // Color de fondo (gris claro)
-                pdf.setLineWidth(0.1); // Ancho del borde
-
-                pdf.rect(10, y, 70, 10, 'FD'); // Rectángulo para 'Time'
-                pdf.rect(74, y, 20, 10, 'FD'); // Rectángulo para 'Vehicle'
-                pdf.rect(94, y, 80, 10, 'FD'); // Rectángulo para 'Address'
-                pdf.rect(174, y, 30, 10, 'FD'); // Rectángulo para 'Speed'
-                pdf.rect(10, y + 30, 63, 10, 'FD'); // Rectángulo para 'Coordinates'
-
-                pdf.setFontSize(10);
-                pdf.text('Time', 14, y + 6); // Texto para 'Time'
-                pdf.text('Vehicle', 78, y + 6); // Texto para 'Vehicle'
-                pdf.text('Address', 100, y + 6); // Texto para 'Address'
-                pdf.text('Speed', 178, y + 6); // Texto para 'Speed'
-                pdf.text('Satellite Screenshot', 14, y + 36); // Texto para 'Coordinates'
-
-                y += 20;
-
-                // Agregar los datos del formulario al PDF
-                const time = document.getElementById('timestamp').value;
-                const speed = document.getElementById('speed').value;
-                pdf.text(time, 12, y);
-                pdf.text(vehicleSelect, 78, y);
-                pdf.text(addressSelect, 100, y);
-                pdf.text(speed, 178, y);
-
-                pdf.text('Position is based on coordinates:', 14, y + 30);
-                pdf.text(coordinates, 68, y + 30);
-
-                html2canvas(trackingSelectedMap, {
-                    logging: true,
-                    scale: 1,
-                    letterRenderer: 1,
-                    useCORS: true
-                }).then(canvas => {
-                    const imgWidth = 130;
-                    const imgHeight = canvas.height * imgWidth / canvas.width;
-                    const imgData = canvas.toDataURL('image/png');
-                    pdf.addImage(imgData, 'PNG', 14, y + 35, imgWidth, imgHeight);
-                    const filename = 'vehicle_selected_data.pdf';
-                    pdf.save(filename);
-                })
-
-            });
             // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
             const closeBtn = document.getElementById('closeBtn');
             closeBtn.addEventListener('click', () => {
                 modal.style.display = 'none';
             });
         }
-
     }
 
-    // Selects    
-    routeList.addEventListener('change', function () {
-        selectedRouteTag = this.value;
+
+
+    // Events Selects    
+    routeList.addEventListener('change', async (event) => {
+        selectedRouteTag = event.target.value;
         lastTime = 0; // Reiniciar lastTime para cuando se cambia de ruta obtener datos nuevos al ultimo return del route API ya almacenado.
         document.getElementById('svgSelectRoute').classList.remove('invisible');
-        fetchVehicleLocations();
+        agencyTag = event.target.selectedOptions[0].getAttribute('data-agency');
+        await fetchVehicleLocations();
     });
 
     vehicleList.addEventListener('change', function () {
@@ -454,6 +383,8 @@ document.addEventListener("DOMContentLoaded", function () {
             routeList.innerHTML += routeListToHTML;
         }
     });
+
+
 
     // Reports 
     async function generatePDF(event) {
@@ -504,17 +435,86 @@ document.addEventListener("DOMContentLoaded", function () {
                 y += 10;
             }
         });
-
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
         const filename = 'vehicle_tracking_data.pdf';
         doc.output('dataurlnewwindow', { filename });
     }
-
-    // Agregar evento al botón de descarga de PDF
+    // Botón de descarga de Table PDF
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
     downloadPdfBtn.addEventListener('click', generatePDF);
 
 
+    function vehicleSelectedPdf() {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+        const trackingSelectedMap = document.getElementById('trackingSelectedMap');
+
+        // Configurar estilos y título
+        pdf.setFontSize(18);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Vehicle Position Data', 14, 22);
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Gilberto Fontanez A Software Developer Report', 14, 28);
+
+        pdf.setFontSize(12);
+        let y = 44; // Posición inicial en Y
+
+        // Agregar encabezados con estilo
+        pdf.setDrawColor(0); // Color del borde (negro)
+        pdf.setFillColor(200); // Color de fondo (gris claro)
+        pdf.setLineWidth(0.1); // Ancho del borde
+
+        pdf.rect(10, y, 70, 10, 'FD'); // Rectángulo para 'Time'
+        pdf.rect(74, y, 20, 10, 'FD'); // Rectángulo para 'Vehicle'
+        pdf.rect(94, y, 80, 10, 'FD'); // Rectángulo para 'Address'
+        pdf.rect(174, y, 30, 10, 'FD'); // Rectángulo para 'Speed'
+        pdf.rect(10, y + 30, 63, 10, 'FD'); // Rectángulo para 'Coordinates'
+
+        pdf.setFontSize(10);
+        pdf.text('Time', 14, y + 6); // Texto para 'Time'
+        pdf.text('Vehicle', 78, y + 6); // Texto para 'Vehicle'
+        pdf.text('Address', 100, y + 6); // Texto para 'Address'
+        pdf.text('Speed', 178, y + 6); // Texto para 'Speed'
+        pdf.text('Satellite Screenshot', 14, y + 36); // Texto para 'Coordinates'
+
+        y += 20;
+
+        // Agregar los datos del formulario al PDF
+        const timeFormValue = document.getElementById('timestamp').value;
+        const vehicleFormValue = document.getElementById('vehicle').value;
+        const addressFormValue = document.getElementById('address').value;
+        const speedFormValue = document.getElementById('speed').value;
+        const coordinatesFormValue = document.getElementById('coordinates').value;
+
+        pdf.text(timeFormValue, 12, y);
+        pdf.text(vehicleFormValue, 78, y);
+        pdf.text(addressFormValue, 100, y);
+        pdf.text(speedFormValue, 178, y);
+
+        pdf.text('Position is based on coordinates:', 14, y + 30);
+        pdf.text(coordinatesFormValue, 68, y + 30);
+
+        html2canvas(trackingSelectedMap, {
+            logging: true,
+            scale: 1,
+            letterRenderer: 1,
+            useCORS: true
+        }).then(canvas => {
+            const imgWidth = 130;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            const imgData = canvas.toDataURL('image/png');
+            pdf.addImage(imgData, 'PNG', 14, y + 35, imgWidth, imgHeight);
+            const filename = '(' + vehicleFormValue + ')vehicle_' + timeFormValue + '_data.pdf';
+            pdf.save(filename);
+        });
+    }
+    // Botón de descarga de Selected Vehicle PDF
+    const vehicleSelectedPdfBtn = document.getElementById('trackingSelectedPdfBtn');
+    vehicleSelectedPdfBtn.addEventListener('click', vehicleSelectedPdf);
+
+
+    // Función para generar el Excel    
     function generateExcel(event) {
         event.preventDefault();
         // Crear un libro de Excel
@@ -542,8 +542,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // Guardar el archivo de Excel
         XLSX.writeFile(workbook, 'vehicle_tracking_data.xlsx');
     }
-
-    // Agregar evento al botón de descarga de Excel
+    // Botón de descarga de Table Excel
     const downloadExcelBtn = document.getElementById('downloadExcelBtn');
     downloadExcelBtn.addEventListener('click', generateExcel);
+
+
 });
