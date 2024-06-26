@@ -213,13 +213,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function insertVehicleData(vehicle, positionGeocoded, speed, created_at, id) {
         const tableBody = document.getElementById('vehicleData');
-        // Remove "No data available" row if it exists
         const noDataRow = document.getElementById('noDataRow');
         if (noDataRow) {
             noDataRow.remove();
         }
-        // Create new row with vehicle data
+
         const newRow = document.createElement('tr');
+        newRow.classList.add('odd:bg-white', 'odd:dark:bg-gray-900', 'even:bg-gray-100', 'even:dark:bg-gray-800');
+
         const vehicleCell = document.createElement('td');
         const vehicleLink = document.createElement('a');
         vehicleLink.textContent = vehicle;
@@ -255,7 +256,6 @@ document.addEventListener("DOMContentLoaded", function () {
         idCell.value = id;
         idCell.classList.add('idSelect', 'hidden', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
 
-
         newRow.appendChild(timestampCell);
         newRow.appendChild(vehicleCell);
         newRow.appendChild(addressCell);
@@ -263,31 +263,59 @@ document.addEventListener("DOMContentLoaded", function () {
         newRow.appendChild(idCell);
 
         tableBody.appendChild(newRow);
-        addRowClickListeners()
+
+        addRowClickListeners();
     }
 
 
-    // Función para agregar eventos de clic a las filas de la tabla
-    function addRowClickListeners() {
-        document.querySelectorAll('tr').forEach(row => {
-            // Remover cualquier evento de clic existente
-            row.removeEventListener('click', rowSelectedVehicle);
+  // Función para agregar eventos de clic a las filas de la tabla
+function addRowClickListeners() {
+    document.querySelectorAll('#vehicleData tr').forEach(row => {
+        // Remover cualquier evento de clic existente
+        row.removeEventListener('click', rowSelectedVehicle);
 
-            // Agregar el nuevo evento de clic
-            row.addEventListener('click', rowSelectedVehicle);
+        // Agregar el nuevo evento de clic
+        row.addEventListener('click', rowSelectedVehicle);
+    });
+
+    // Agregar eventos de clic a los encabezados para ordenar las columnas
+    document.querySelectorAll('th a').forEach(header => {
+        header.addEventListener('click', function(e) {
+            e.preventDefault();
+            const table = header.closest('table');
+            const index = Array.from(header.closest('tr').children).indexOf(header.closest('th'));
+            const order = header.dataset.order = -(header.dataset.order || -1);
+            const rows = Array.from(table.querySelector('tbody').rows);
+
+            rows.sort((rowA, rowB) => {
+                const cellA = rowA.cells[index].innerText;
+                const cellB = rowB.cells[index].innerText;
+                return (cellA > cellB ? 1 : cellA < cellB ? -1 : 0) * order;
+            });
+
+            table.querySelector('tbody').innerHTML = '';
+            rows.forEach(row => {
+                table.querySelector('tbody').appendChild(row);
+            });
         });
-    }
+    });
+}
 
-    // Función manejadora del evento de clic en las filas
-    async function rowSelectedVehicle(event) {
-        selectedRow = event.currentTarget; // Guardar la fila seleccionada
-        console.log('Selected row:', selectedRow);
-        const idSelect = selectedRow.querySelector('.idSelect').value;
+// Función manejadora del evento de clic en las filas
+async function rowSelectedVehicle(event) {
+    const selectedRow = event.currentTarget; // Guardar la fila seleccionada
+    console.log('Selected row:', selectedRow);
+    const idSelectElement = selectedRow.querySelector('.idSelect');
+    
+    if (idSelectElement) {
+        const idSelect = idSelectElement.value;
         console.log('idSelect:', idSelect);
+        
         const { data: rowSelectedVehicle, error } = await database
             .from('tracking')
             .select('*')
             .eq('id', idSelect);
+        
         if (error) {
             console.error(error);
         } else {
@@ -297,6 +325,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const addressSelect = rowSelectedVehicle[0].positionGeocoded;
             const speedSelect = rowSelectedVehicle[0].speed;
             const timestampSelect = rowSelectedVehicle[0].created_at;
+            
             // Mostrar el modal con id "static-modal"
             const modal = document.getElementById('static-modal');
             modal.style.display = 'flex';
@@ -304,7 +333,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const trackingSelectedPdfBtn = document.getElementById('trackingSelectedPdfBtn');
             trackingSelectedPdfBtn.classList.remove('hidden');
             trackingSelectedPdfBtn.classList.add('inline-flex');
-            // Agregar los a values en los campos
+            
+            // Agregar los valores en los campos
             document.getElementById('vehicle').value = vehicleSelect;
             const coordinates = 'Latitude: ' + coordinatesSelect[0] + ', ' + 'Longitude: ' + coordinatesSelect[1];
             document.getElementById('coordinates').value = coordinates;
@@ -321,29 +351,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 hour12: true
             });
 
-            // Crear el selected mapa
-            // Verificar si el contenedor ya tiene un mapa inicializado
+            // Crear el mapa seleccionado
             if (L.DomUtil.get('trackingSelectedMap') !== null) {
-                // Si ya hay un mapa, eliminarlo antes de crear uno nuevo
                 L.DomUtil.get('trackingSelectedMap')._leaflet_id = null;
             }
 
             const popupContent = `<b>Vehicle:</b> ${vehicleSelect} <br><b>Address:</b> ${addressSelect} <br> <b> ${coordinates} </b> <br>`;
-            selectedMap = L.map('trackingSelectedMap').setView([coordinatesSelect[0], coordinatesSelect[1]], 18);
+            const selectedMap = L.map('trackingSelectedMap', { zoomControl: false, addControl: false, scrollWheelZoom: false, touchZoom: false, doubleClickZoom: false , dragging: false, touchZoomRotate: false }).setView([coordinatesSelect[0], coordinatesSelect[1]], 18);
             console.log('selectedMap coordinates:', coordinatesSelect);
             const tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png';
-            L.tileLayer(tileUrl, {
-                maxZoom: 18,
-                minZoom: 18,
-                scrollWheel: false,
-                zoom: false,
-                touch: false,
-                click: false,
-                mousedown: false,
-                mouseup: false,
-                mouse: false,
-                scrollWheelZoom: false
-            }).addTo(selectedMap);
+            L.tileLayer(tileUrl).addTo(selectedMap);
             L.marker([coordinatesSelect[0], coordinatesSelect[1]]).addTo(selectedMap).bindPopup(popupContent).openPopup();
 
             // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
@@ -352,7 +369,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 modal.style.display = 'none';
             });
         }
+    } else {
+        console.error('No idSelect element found in the selected row.');
     }
+}
 
 
 
