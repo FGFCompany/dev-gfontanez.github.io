@@ -1025,10 +1025,6 @@ video {
   max-width: 32rem;
 }
 
-.max-w-screen-lg {
-  max-width: 1024px;
-}
-
 .max-w-screen-md {
   max-width: 768px;
 }
@@ -2517,10 +2513,6 @@ video {
   letter-spacing: -0.025em;
 }
 
-.tracking-wider {
-  letter-spacing: 0.05em;
-}
-
 .text-\[\#336699\]\/\[\.35\] {
   color: rgb(51 102 153 / .35);
 }
@@ -3114,8 +3106,8 @@ element::-webkit-scrollbar {
 }
 
 @media not all and (min-width: 640px) {
-  .max-sm\:mb-10 {
-    margin-bottom: 2.5rem;
+  .max-sm\:mb-2 {
+    margin-bottom: 0.5rem;
   }
 
   .max-sm\:mb-4 {
@@ -3140,6 +3132,10 @@ element::-webkit-scrollbar {
 
   .max-sm\:mt-3 {
     margin-top: 0.75rem;
+  }
+
+  .max-sm\:inline-block {
+    display: inline-block;
   }
 
   .max-sm\:hidden {
@@ -3414,6 +3410,11 @@ element::-webkit-scrollbar {
   .lg\:text-3xl {
     font-size: 1.875rem;
     line-height: 2.25rem;
+  }
+
+  .lg\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
 
   .lg\:text-xl {

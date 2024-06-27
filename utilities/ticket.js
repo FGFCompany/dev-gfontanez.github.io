@@ -1,7 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Función para establecer una cookie sin expiración
-    function setCookie(name, value) {
-        document.cookie = name + "=" + value + ";path=/";
+    // Función para establecer una cookie con una fecha de expiración
+    function setCookie(name, value, expirationDays) {
+        const date = new Date();
+        date.setTime(date.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
+        const expires = `expires=${date.toUTCString()}`;
+        document.cookie = `${name}=${value};${expires};path=/`;
     }
 
     // Función para obtener una cookie
@@ -18,15 +21,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Comprobar si la cookie de sesión existe
     let sessionID = getCookie("sessionID");
+    let expirationDays = 180; // 6 meses en días
+    let sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-    if (!sessionID) {
-        // No hay cookie de sesión, crear una nueva
+    if (!sessionID || new Date(sessionID) < sixMonthsAgo) {
+        // No hay cookie de sesión o ya pasaron 6 meses, crear una nueva
         sessionID = Math.random().toString(36).substring(2);  // Generar un ID de sesión aleatorio
-        setCookie("sessionID", sessionID);  // Establecer la cookie de sesión sin expiración
+        setCookie("sessionID", sessionID, expirationDays);  // Establecer la cookie de sesión con una fecha de expiración
+        fetchSelectedVehicleLocation(sessionID);
     } else {
-        // La cookie de sesión existe, continuar usándola
+        // La cookie de sesión existe y aún no pasaron 6 meses, continuar usándola
         console.log("ID existente:", sessionID);
     }
+
+
     // DB SupaBase API
     const database = supabase.createClient('https://svdtdtpqscizmxlcicox.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZHRkdHBxc2Npem14bGNpY294Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY2NTU2ODEsImV4cCI6MjAzMjIzMTY4MX0.9Hkev2jhj11Q6r6DXrf2gpixaVTDj2vODRYwpxB5Y50');
 
@@ -59,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Función para agregar la fila de "No data available"
     function addNODataRow() {
-        const tableBody = document.getElementById('tbobyTicket');
+        const tableBody = document.getElementById('tbobyTicketTable');
         const newRow = document.createElement('tr');
         newRow.id = 'noDataRow';
         const newCell = document.createElement('td');
@@ -72,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Función para insertar datos a la tabla
     function addDataRow(fullName, priority, subject, description, id) {
-        const tableBody = document.getElementById('tbobyTicket');
+        const tableBody = document.getElementById('tbobyTicketTable');
         // Eliminar la fila de "No data available" si existe
         const noDataRow = document.getElementById('noDataRow');
         if (noDataRow) {
@@ -81,6 +90,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Create new row with record data
         const newRow = document.createElement('tr');
+        newRow.classList.add('odd:bg-white', 'odd:dark:bg-gray-900', 'even:bg-gray-100', 'even:dark:bg-gray-800');
+
         // Create cells for each column
         const fullNameCell = document.createElement('td');
         fullNameCell.textContent = fullName;
@@ -130,14 +141,35 @@ document.addEventListener("DOMContentLoaded", function () {
         addRowClickListeners()
     }
 
-    // Función para agregar eventos de clic a las filas de la tabla
+    // Función para agregar eventos de click a las filas de la tabla
     function addRowClickListeners() {
-        document.querySelectorAll('tr').forEach(row => {
-            // Remover cualquier evento de clic existente
+        document.querySelectorAll('#tbobyTicketTable tr').forEach(row => {
+            // Remover cualquier evento de click existente
             row.removeEventListener('click', rowTicketSelected);
 
-            // Agregar el nuevo evento de clic
+            // Agregar el nuevo evento de click
             row.addEventListener('click', rowTicketSelected);
+        });
+        // Agregar eventos de sort click a los encabezados para ordenar las columnas
+        document.querySelectorAll('th a').forEach(header => {
+            header.addEventListener('click', function (e) {
+                e.preventDefault();
+                const table = header.closest('table');
+                const index = Array.from(header.closest('tr').children).indexOf(header.closest('th'));
+                const order = header.dataset.order = -(header.dataset.order || -1);
+                const rows = Array.from(table.querySelector('tbody').rows);
+
+                rows.sort((rowA, rowB) => {
+                    const cellA = rowA.cells[index].innerText;
+                    const cellB = rowB.cells[index].innerText;
+                    return (cellA > cellB ? 1 : cellA < cellB ? -1 : 0) * order;
+                });
+
+                table.querySelector('tbody').innerHTML = '';
+                rows.forEach(row => {
+                    table.querySelector('tbody').appendChild(row);
+                });
+            });
         });
     }
 
@@ -444,7 +476,7 @@ document.addEventListener("DOMContentLoaded", function () {
         event.preventDefault();
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const tableBody = document.getElementById('tbobyTicket');
+        const tableBody = document.getElementById('tbobyTicketTable');
 
         // Configurar estilos y título
         doc.setFontSize(14);
@@ -512,7 +544,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var sheetData = [['Ticket Data'],
         ['Gilberto Fontanez A Software Developer Report'],
         [' '], ['Full Name', 'Subject', 'Priority', 'Description']];
-        var tableBody = document.getElementById('tbobyTicket');
+        var tableBody = document.getElementById('tbobyTicketTable');
         var rows = tableBody.querySelectorAll('tr');
         rows.forEach((row, index) => {
             const cols = row.querySelectorAll('td');
