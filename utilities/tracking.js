@@ -311,12 +311,10 @@ document.addEventListener("DOMContentLoaded", function () {
     async function rowSelectedVehicle(event) {
         const selectedRow = event.currentTarget; // Guardar la fila seleccionada
         console.log('Selected row:', selectedRow);
-        const idSelectElement = selectedRow.querySelector('.idSelect');
+        const idSelect = selectedRow.querySelector('.idSelect').value;
 
-        if (idSelectElement) {
-            const idSelect = idSelectElement.value;
+        if (idSelect) {
             console.log('idSelect:', idSelect);
-
             const { data: rowSelectedVehicle, error } = await database
                 .from('tracking')
                 .select('*')
@@ -340,7 +338,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 trackingSelectedPdfBtn.classList.remove('hidden');
                 trackingSelectedPdfBtn.classList.add('inline-flex');
 
-                // Agregar los valores en los campos
+                // LLenar los valores en los campos del modal
                 document.getElementById('vehicle').value = vehicleSelect;
                 const coordinates = 'Latitude: ' + coordinatesSelect[0] + ', ' + 'Longitude: ' + coordinatesSelect[1];
                 document.getElementById('coordinates').value = coordinates;

@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (records.length > 0) {
                 // Insertar los registros en la tabla
                 records.forEach(loadRecord => {
-                    addDataRow(loadRecord.fullName, loadRecord.priority, loadRecord.subject, loadRecord.description, loadRecord.id);
+                    addDataRow(loadRecord.fullName, loadRecord.status, loadRecord.subject, loadRecord.description, loadRecord.id);
                 });
             } else {
                 addNODataRow();
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Función para insertar datos a la tabla
-    function addDataRow(fullName, priority, subject, description, id) {
+    function addDataRow(fullName, status, subject, description, id) {
         const tableBody = document.getElementById('tbobyTicketTable');
         // Eliminar la fila de "No data available" si existe
         const noDataRow = document.getElementById('noDataRow');
@@ -109,12 +109,12 @@ document.addEventListener("DOMContentLoaded", function () {
         subjectCell.style.overflow = 'hidden';
         subjectCell.style.textOverflow = 'ellipsis';
 
-        const priorityCell = document.createElement('td');
-        priorityCell.textContent = priority;
-        priorityCell.classList.add('prioritySelect', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
-        priorityCell.style.maxWidth = '80px';
-        priorityCell.style.overflow = 'hidden';
-        priorityCell.style.textOverflow = 'ellipsis';
+        const statusCell = document.createElement('td');
+        statusCell.textContent = status;
+        statusCell.classList.add('statusSelect', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-900', 'dark:text-white');
+        statusCell.style.maxWidth = '80px';
+        statusCell.style.overflow = 'hidden';
+        statusCell.style.textOverflow = 'ellipsis';
 
         const descriptionCell = document.createElement('td');
         descriptionCell.textContent = description;
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         newRow.appendChild(fullNameCell);
         newRow.appendChild(subjectCell);
-        newRow.appendChild(priorityCell);
+        newRow.appendChild(statusCell);
         newRow.appendChild(descriptionCell);
         newRow.appendChild(idCell);
 
@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", function () {
         selectedRow = event.currentTarget; // Guardar la fila seleccionada
         // Obtener la data de la fila seleccionada
         const fullnameSelect = selectedRow.querySelector('.fullnameSelect').innerText;
-        const prioritySelect = selectedRow.querySelector('.prioritySelect').innerText;
+        const statusSelect = selectedRow.querySelector('.statusSelect').innerText;
         const subjectSelect = selectedRow.querySelector('.subjectSelect').innerText;
         const descriptionSelect = selectedRow.querySelector('.descriptionSelect').innerText;
         const idSelect = selectedRow.querySelector('.idSelect').value;
@@ -190,14 +190,14 @@ document.addEventListener("DOMContentLoaded", function () {
         commentSection.classList.remove('hidden');
         const saveNewTicket = document.getElementById('saveNewTicket');
         saveNewTicket.classList.add('hidden');
-        const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');
-        downloadTicketPdfBtn.classList.remove('hidden');
-        downloadTicketPdfBtn.classList.add('inline-flex');
+        const ticketSelectedPdfBtn = document.getElementById('ticketSelectedPdfBtn');
+        ticketSelectedPdfBtn.classList.remove('hidden');
+        ticketSelectedPdfBtn.classList.add('inline-flex');
         const updateNewTicket = document.getElementById('updateNewTicket');
         updateNewTicket.classList.remove('hidden');
-        // Convertir los innerText a values de los campos
+        // Agregar los valores en los campos
         document.getElementById('fullName').value = fullnameSelect;
-        document.getElementById('priority').value = prioritySelect;
+        document.getElementById('status').value = statusSelect;
         document.getElementById('subject').value = subjectSelect;
         document.getElementById('description').value = descriptionSelect;
         // Cargar los comentarios
@@ -250,99 +250,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Funcion para abrir y cerrar el modal en New Ticket
-    document.getElementById('openNewTicket').addEventListener('click', onOpenNewTicket);
-    async function onOpenNewTicket(event) {
-        event.preventDefault();
-        const modal = document.getElementById('static-modal');
-        modal.style.display = 'flex';
-        document.getElementById('modalTitle').innerText = 'New Ticket';
-        const commentSection = document.getElementById('commentSection');
-        commentSection.classList.add('hidden');
-        const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');
-        downloadTicketPdfBtn.classList.add('hidden');
-        downloadTicketPdfBtn.classList.remove('inline-flex');
-        const saveNewTicket = document.getElementById('saveNewTicket');
-        saveNewTicket.classList.remove('hidden');
-        const updateNewTicket = document.getElementById('updateNewTicket');
-        updateNewTicket.classList.add('hidden');
-        // Resetear el formulario
-        document.getElementById('ticketForm').reset();
-        // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
-        const closeBtn = document.getElementById('closeBtn');
-        closeBtn.addEventListener('click', async () => {
-            modal.style.display = 'none';
-        });
-    }
-
-    document.getElementById('saveNewTicket').addEventListener('click', onSaveNewTicket);
-    async function onSaveNewTicket(event) {
-        event.preventDefault();
-        const fullName = document.getElementById('fullName').value;
-        const priority = document.getElementById('priority').value;
-        const subject = document.getElementById('subject').value;
-        const description = document.getElementById('description').value;
-        // Verificar si los campos no están vacíos
-        if (!fullName || !priority || !subject || !description) {
-            console.error('Todos los campos deben ser completados.');
-            return;
-        }
-        try {
-            const { data: insertedData, error } = await database
-                .from('ticket')
-                .insert([
-                    {
-                        fullName: fullName,
-                        priority: priority,
-                        subject: subject,
-                        description: description,
-                        tempuser: sessionID
-                    }
-                ])
-                .select('*');
-
-            if (error) {
-                throw error;
-            }
-
-            if (insertedData.length > 0) {
-                const insertedRecord = insertedData[0];
-                addDataRow(insertedRecord.fullName, insertedRecord.priority, insertedRecord.subject, insertedRecord.description, insertedRecord.id);
-                // Resetear el formulario
-                document.getElementById('ticketForm').reset();
-                document.querySelector('[data-modal-hide="static-modal"]').click();
-            } else {
-                console.error('Error al insertar el registro.');
-            }
-        } catch (err) {
-            console.error('Error al insertar el registro:', err.message);
-        }
-    }
-
-
-    // Funcion para validar y llamar función para actualizar datos en el boton Save Changes
-    document.getElementById("updateNewTicket").addEventListener("click", onUpdateTicket);
-    async function onUpdateTicket(event) {
-        event.preventDefault();
-        const fullName = document.getElementById("fullName").value;
-        const priority = document.getElementById("priority").value;
-        const subject = document.getElementById("subject").value;
-        const description = document.getElementById("description").value;
-        const id = selectedRow.querySelector('.idSelect').value;
-        // Primero, obtenemos el array de comentarios actual
-        const { data: updatedData, error } = await database
-            .from('ticket')
-            .update({ fullName, priority, subject, description })
-            .eq('id', id);
-        if (error) {
-            console.error('Error updating data in Supabase:', error);
-        } else {
-            // Cerrar el modal
-            document.querySelector('[data-modal-hide="static-modal"]').click();
-        }
-    };
-
-
     // Funcion para agregar un nuevo comentario
     document.getElementById("addComment").addEventListener("click", onAddComment);
     async function onAddComment(event) {
@@ -372,6 +279,99 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
 
+    // Funcion para abrir y cerrar el modal en New Ticket
+    document.getElementById('openNewTicket').addEventListener('click', onOpenNewTicket);
+    async function onOpenNewTicket(event) {
+        event.preventDefault();
+        const modal = document.getElementById('static-modal');
+        modal.style.display = 'flex';
+        document.getElementById('modalTitle').innerText = 'New Ticket';
+        const commentSection = document.getElementById('commentSection');
+        commentSection.classList.add('hidden');
+        const ticketSelectedPdfBtn = document.getElementById('ticketSelectedPdfBtn');
+        ticketSelectedPdfBtn.classList.add('hidden');
+        ticketSelectedPdfBtn.classList.remove('inline-flex');
+        const saveNewTicket = document.getElementById('saveNewTicket');
+        saveNewTicket.classList.remove('hidden');
+        const updateNewTicket = document.getElementById('updateNewTicket');
+        updateNewTicket.classList.add('hidden');
+        // Resetear el formulario
+        document.getElementById('ticketForm').reset();
+        // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
+        const closeBtn = document.getElementById('closeBtn');
+        closeBtn.addEventListener('click', async () => {
+            modal.style.display = 'none';
+        });
+    }
+
+    document.getElementById('saveNewTicket').addEventListener('click', onSaveNewTicket);
+    async function onSaveNewTicket(event) {
+        event.preventDefault();
+        const fullName = document.getElementById('fullName').value;
+        const status = document.getElementById('status').value;
+        const subject = document.getElementById('subject').value;
+        const description = document.getElementById('description').value;
+        // Verificar si los campos no están vacíos
+        if (!fullName || !status || !subject || !description) {
+            console.error('Todos los campos deben ser completados.');
+            return;
+        }
+        try {
+            const { data: insertedData, error } = await database
+                .from('ticket')
+                .insert([
+                    {
+                        fullName: fullName,
+                        status: status,
+                        subject: subject,
+                        description: description,
+                        tempuser: sessionID
+                    }
+                ])
+                .select('*');
+
+            if (error) {
+                throw error;
+            }
+
+            if (insertedData.length > 0) {
+                const insertedRecord = insertedData[0];
+                addDataRow(insertedRecord.fullName, insertedRecord.status, insertedRecord.subject, insertedRecord.description, insertedRecord.id);
+                // Resetear el formulario
+                document.getElementById('ticketForm').reset();
+                document.querySelector('[data-modal-hide="static-modal"]').click();
+            } else {
+                console.error('Error al insertar el registro.');
+            }
+        } catch (err) {
+            console.error('Error al insertar el registro:', err.message);
+        }
+    }
+
+
+    // Funcion para validar y llamar función para actualizar datos en el boton Save Changes
+    document.getElementById("updateNewTicket").addEventListener("click", onUpdateTicket);
+    async function onUpdateTicket(event) {
+        event.preventDefault();
+        const fullName = document.getElementById("fullName").value;
+        const status = document.getElementById("status").value;
+        const subject = document.getElementById("subject").value;
+        const description = document.getElementById("description").value;
+        const id = selectedRow.querySelector('.idSelect').value;
+        // Primero, obtenemos el array de comentarios actual
+        const { data: updatedData, error } = await database
+            .from('ticket')
+            .update({ fullName, status, subject, description })
+            .eq('id', id);
+        if (error) {
+            console.error('Error updating data in Supabase:', error);
+        } else {
+            // Cerrar el modal
+            document.querySelector('[data-modal-hide="static-modal"]').click();
+        }
+    };
+
+
     // Función para suscribirse a los cambios en tiempo real de la tabla "ticket"
     async function subscribeToRealtimeUpdates() {
         const { error } = await database
@@ -386,7 +386,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (idCell && idCell.value === subscribeRecord.id) {
                         row.querySelector('.fullnameSelect').innerText = subscribeRecord.fullName;
                         row.querySelector('.subjectSelect').innerText = subscribeRecord.subject;
-                        row.querySelector('.prioritySelect').innerText = subscribeRecord.priority;
+                        row.querySelector('.statusSelect').innerText = subscribeRecord.status;
                         row.querySelector('.descriptionSelect').innerText = subscribeRecord.description;
 
                         // Crear nuevas filas para los comentarios
@@ -421,7 +421,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Obtener los valores del formulario
         const fullName = ticketForm.querySelector('#fullName').value;
-        const priority = ticketForm.querySelector('#priority').value;
+        const status = ticketForm.querySelector('#status').value;
         const subject = ticketForm.querySelector('#subject').value;
         const description = ticketForm.querySelector('#description').value;
 
@@ -445,8 +445,8 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.text(fullName, 60, y);
         y += 10;
 
-        doc.text('Priority:', 14, y);
-        doc.text(priority, 60, y);
+        doc.text('status:', 14, y);
+        doc.text(status, 60, y);
         y += 10;
 
         doc.text('Subject:', 14, y);
@@ -467,8 +467,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
     // Agregar evento al botón de descarga de PDF
-    const downloadTicketPdfBtn = document.getElementById('downloadTicketPdfBtn');
-    downloadTicketPdfBtn.addEventListener('click', generatePDFTicket);
+    const ticketSelectedPdfBtn = document.getElementById('ticketSelectedPdfBtn');
+    ticketSelectedPdfBtn.addEventListener('click', generatePDFTicket);
 
 
     // Reports Table
@@ -496,12 +496,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         doc.rect(14, y, 40, 8, 'FD'); // Rectángulo para 'Full Name'
         doc.rect(54, y, 40, 8, 'FD'); // Rectángulo para 'Subject'
-        doc.rect(94, y, 30, 8, 'FD'); // Rectángulo para 'Priority'
+        doc.rect(94, y, 30, 8, 'FD'); // Rectángulo para 'status'
         doc.rect(124, y, 60, 8, 'FD'); // Rectángulo para 'Description'
 
         doc.text('Full Name', 16, y + 5); // Texto para 'Full Name'
         doc.text('Subject', 56, y + 5); // Texto para 'Subject'
-        doc.text('Priority', 96, y + 5); // Texto para 'Priority'
+        doc.text('Status', 96, y + 5); // Texto para 'status'
         doc.text('Description', 126, y + 5); // Texto para 'Description'
 
         y += 15;
@@ -543,7 +543,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Crear una hoja de cálculo
         var sheetData = [['Ticket Data'],
         ['Gilberto Fontanez A Software Developer Report'],
-        [' '], ['Full Name', 'Subject', 'Priority', 'Description']];
+        [' '], ['Full Name', 'Subject', 'Status', 'Description']];
         var tableBody = document.getElementById('tbobyTicketTable');
         var rows = tableBody.querySelectorAll('tr');
         rows.forEach((row, index) => {
