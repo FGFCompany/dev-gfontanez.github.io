@@ -3106,8 +3106,12 @@ element::-webkit-scrollbar {
 }
 
 @media not all and (min-width: 640px) {
-  .max-sm\:mb-2 {
-    margin-bottom: 0.5rem;
+  .max-sm\:mb-16 {
+    margin-bottom: 4rem;
+  }
+
+  .max-sm\:mb-20 {
+    margin-bottom: 5rem;
   }
 
   .max-sm\:mb-4 {

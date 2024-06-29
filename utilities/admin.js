@@ -251,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const subjectCell = document.createElement('td');
                 const subjectLink = document.createElement('a');
                 subjectCell.textContent = loadUser[i].subject;
-                subjectCell.classList.add('subjectSelect', 'hover:underline', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-sky-500', 'dark:text-sky-400');
+                subjectCell.classList.add('subjectSelect', 'truncate', 'hover:underline', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-sky-500', 'dark:text-sky-400');
                 subjectCell.appendChild(subjectLink);
 
 
@@ -409,7 +409,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("addComment").addEventListener("click", onAddComment);
     async function onAddComment(event) {
         event.preventDefault();
-        const comment = document.getElementById("comments").value;
+        const comment = "Admin: " + document.getElementById("comments").value;
         console.log('Los comment:', comment);
         const ticketId = document.getElementById('ticketId').value;
         // Primero, obtenemos el array de comentarios actual
