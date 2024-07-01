@@ -5,15 +5,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // Call the functions to load the information
     loadUsersTracking();
     loadUsersTicket();
+    let selectedUserTracking = null;
+    let selectedUserTicket = null;
+
     // Event listener for the change event on the select element Tracking
     document.getElementById('usersTracking').addEventListener('change', function () {
-        const tempuser = this.value;
-        loadUsersTrackingTable(tempuser);
+        selectedUserTracking = this.value;
+        loadUsersTrackingTable(selectedUserTracking);
     });
     // Event listener for the change event on the select element Ticket
     document.getElementById('usersTicket').addEventListener('change', function () {
-        const tempuser = this.value;
-        loadUsersTicketTable(tempuser);
+        selectedUserTicket = this.value;
+        loadUsersTicketTable(selectedUserTicket);
     })
 
 
@@ -42,11 +45,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Function to load the table data
-    async function loadUsersTrackingTable(tempuser) {
+    async function loadUsersTrackingTable(selectedUserTracking) {
         const { data: loadUser, error } = await database
             .from('tracking')
             .select('*')
-            .eq('tempuser', tempuser);
+            .eq('tempuser', selectedUserTracking);
         if (error) {
             console.error('Error fetching data:', error);
         } else {
@@ -61,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const vehicleCell = document.createElement('td');
                 const vehicleLink = document.createElement('a');
                 vehicleCell.textContent = loadUser[i].vehicle;
-                vehicleCell.classList.add('vehicleSelect', 'hover:underline', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-sky-500', 'dark:text-sky-400');
+                vehicleCell.classList.add('vehicleSelect', 'hover:underline', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-emerald-500', 'dark:text-emerald-400');
                 vehicleCell.appendChild(vehicleLink);
 
 
@@ -224,11 +227,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
     // Function to load the table data
-    async function loadUsersTicketTable(tempuser) {
+    async function loadUsersTicketTable(selectedUserTicket) {
         const { data: loadUser, error } = await database
             .from('ticket')
             .select('*')
-            .eq('tempuser', tempuser);
+            .eq('tempuser', selectedUserTicket);
         if (error) {
             console.error('Error fetching data:', error);
         } else {
@@ -251,7 +254,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const subjectCell = document.createElement('td');
                 const subjectLink = document.createElement('a');
                 subjectCell.textContent = loadUser[i].subject;
-                subjectCell.classList.add('subjectSelect', 'truncate', 'hover:underline', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-sky-500', 'dark:text-sky-400');
+                subjectCell.classList.add('subjectSelect', 'truncate', 'hover:underline', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-emerald-500', 'dark:text-emerald-400');
                 subjectCell.appendChild(subjectLink);
 
 
@@ -310,6 +313,7 @@ document.addEventListener("DOMContentLoaded", function () {
     async function rowSelectedTicket(event) {
         const selectedRow = event.currentTarget; // Guardar la fila seleccionada
         const idSelect = selectedRow.querySelector('.idSelect').value;
+        window.idSelectTicketGlobal = selectedRow.querySelector('.idSelect').value; // Guardar el id Global need fix
         console.log('el id del modal idSelect:', idSelect);
 
         if (idSelect) {
@@ -516,6 +520,7 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.setFontSize(12);
         doc.setFont('helvetica', 'normal');
         doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
+        doc.text(`Username : ${selectedUserTracking}`, 72, 42);
 
         doc.setFontSize(12);
 
@@ -574,9 +579,18 @@ document.addEventListener("DOMContentLoaded", function () {
         // Añadir el pie de página a la última página
         addPageFooter(pageCount, totalPages);
 
-        // Abrir el documento PDF en una nueva pestaña o ventana del navegador
-        const filename = 'vehicle_tracking_data.pdf';
-        doc.output('dataurlnewwindow', { filename });
+        // Generar un timestamp
+        const timestamp = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+        const filename = `(${selectedUserTracking})user_tracking_${timestamp}.pdf`;
+        doc.save(filename);
     }
     // Botón de descarga de Table PDF
     const userTrackingtablePDFBtn = document.getElementById('userTrackingtablePDFBtn');
@@ -646,9 +660,17 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             XLSX.utils.book_append_sheet(workbook, ws, sheetName);
         }
-
         // Guardar el archivo de Excel
-        XLSX.writeFile(workbook, 'vehicle_tracking_data.xlsx');
+        const timestamp = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+        XLSX.writeFile(workbook, `vehicles_table_${timestamp}_tracking_data.xlsx`);
     }
 
     // Botón de descarga de Table Excel
@@ -665,6 +687,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const tableBody = document.getElementById('ticketReportData');
         const rows = tableBody.querySelectorAll('tr');
 
+
         const pageHeight = doc.internal.pageSize.height;
         const margin = 10;
         let y = 44; // Posición inicial en Y para la primera página
@@ -677,9 +700,11 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.setFontSize(12);
         doc.setFont('helvetica', 'normal');
         doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
+        doc.text(`Username : ${selectedUserTicket}`, 72, 42);
+        y + 6;
+
 
         doc.setFontSize(12);
-
         // Agregar encabezados con estilo
         function addTableHeaders() {
             doc.setDrawColor(0); // Color del borde (negro)
@@ -734,10 +759,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Añadir el pie de página a la última página
         addPageFooter(pageCount, totalPages);
-
-        // Abrir el documento PDF en una nueva pestaña o ventana del navegador
-        const filename = 'ticket_report_data.pdf';
-        doc.output('dataurlnewwindow', { filename });
+        const timestamp = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+        const filename = `(${selectedUserTicket})user_ticket_${timestamp}.pdf`;
+        doc.save(filename);
     }
 
     // Botón de descarga de Table PDF
@@ -746,7 +778,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // Función para generar el Excel    
-    function userTickettableExcel(event) {
+    function userTickettableExcel(event, selectedUserTicket) {
         event.preventDefault();
         // Crear un libro de Excel
         var workbook = XLSX.utils.book_new();
@@ -759,10 +791,11 @@ document.addEventListener("DOMContentLoaded", function () {
             sheetData.push(['Page ' + pageNum + ' of ' + totalPages]);
         }
 
-        function createSheetData(rows, startRow, endRow, pageNum) {
+        function createSheetData(rows, startRow, endRow, pageNum, selectedUserTicket) {
             var data = [['Ticket Report Data'],
             ['Gilberto Fontanez A Software Developer Report'],
-            [' '], ['Full Name', 'Subject', 'status', 'Description']];
+            ['Username', selectedUserTicket],
+            [' '], ['Full Name', 'Subject', 'Status', 'Description']];
 
             for (let i = startRow; i < endRow; i++) {
                 const row = rows[i];
@@ -787,35 +820,57 @@ document.addEventListener("DOMContentLoaded", function () {
             if (endRow > rows.length) endRow = rows.length;
 
             var sheetName = 'Page ' + (i + 1);
-            var currentSheetData = createSheetData(rows, startRow, endRow, i + 1);
+            var currentSheetData = createSheetData(rows, startRow, endRow, i + 1, selectedUserTicket);
             var ws = XLSX.utils.aoa_to_sheet(currentSheetData);
+
             // Ajustar el ancho de las columnas
             ws['!cols'] = [
                 { wch: 20 }, // Ancho de la columna 'Full Name'
                 { wch: 25 }, // Ancho de la columna 'Subject'
                 { wch: 15 }, // Ancho de la columna 'status'
-                { wch: 30 }  // Ancho de la columna 'Description'
+                { wch: 30 }, // Ancho de la columna 'Description'
+                { wch: 20 }  // Ancho de la columna 'Username'
             ];
+
             // Aplicar estilo a los encabezados
             var headerRange = XLSX.utils.decode_range(ws['!ref']);
             for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
                 var cell = ws[XLSX.utils.encode_cell({ r: 3, c: C })]; // La fila 3 es la de los encabezados
-                if (!cell.s) cell.s = {};
-                cell.s.fill = {
-                    patternType: "solid",
-                    fgColor: { rgb: "D3D3D3" } // Color gris claro
-                };
+                if (cell && !cell.s) {
+                    cell.s = {};
+                }
+                if (cell) {
+                    cell.s.fill = {
+                        patternType: "solid",
+                        fgColor: { rgb: "D3D3D3" } // Color gris claro
+                    };
+                }
             }
+
             XLSX.utils.book_append_sheet(workbook, ws, sheetName);
         }
 
         // Guardar el archivo de Excel
-        XLSX.writeFile(workbook, 'ticket_report_data.xlsx');
+        const timestamp = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+        XLSX.writeFile(workbook, `(${selectedUserTicket})user_tickets_table_${timestamp}.xlsx`);
     }
 
     // Botón de descarga de Table Excel
     const userTickettableEXCELBtn = document.getElementById('userTickettableEXCELBtn');
-    userTickettableEXCELBtn.addEventListener('click', userTickettableExcel);
+    userTickettableEXCELBtn.addEventListener('click', function (event) {
+        selectedUserTicket;
+        // Llamar a la función userTickettableExcel con el evento y el valor de selectedUserTicket
+        userTickettableExcel(event, selectedUserTicket);
+    });
+
 
 
     function vehicleSelectedPdf() {
@@ -879,7 +934,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const imgHeight = canvas.height * imgWidth / canvas.width;
             const imgData = canvas.toDataURL('image/png');
             pdf.addImage(imgData, 'PNG', 14, y + 35, imgWidth, imgHeight);
-            const filename = '(' + vehicleFormValue + ')vehicle_' + timeFormValue + '_data.pdf';
+            const filename = `(${vehicleFormValue})vehicle_${timeFormValue}_data.pdf`;
             pdf.save(filename);
         });
     }
@@ -895,6 +950,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const ticketFormTicket = document.getElementById('ticketFormTicket');
 
         // Obtener los valores del formulario
+        const idSelect = window.idSelectTicketGlobal;
         const timeCreated = ticketFormTicket.querySelector('#created_atTicket').value;
         const fullName = ticketFormTicket.querySelector('#fullName').value;
         const status = ticketFormTicket.querySelector('#status').value;
@@ -912,6 +968,7 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.setFontSize(12);
         doc.setFont('helvetica', 'normal');
         doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
+        doc.text(`Username : ${selectedUserTicket}`, 14, 36);
 
         // Agregar los datos del formulario al PDF
         doc.setFontSize(12);
@@ -938,12 +995,32 @@ document.addEventListener("DOMContentLoaded", function () {
         y += 10;
 
         doc.text('Comments:', 14, y);
-        doc.text(comments, 60, y);
+        if (Array.isArray(comments)) {
+            comments.forEach(comment => {
+                const bulletX = 60; // Posición X del marcador de viñeta
+                const bulletY = y - 1; // Ajuste para centrar el marcador verticalmente
+                doc.circle(bulletX, bulletY, 1, 'F'); // Dibujar círculo como marcador de viñeta
+                doc.text(comment, 64, y);
+                y += 10; // Espacio entre cada comentario
+            });
+        } else {
+            doc.text(comments, 64, y); // Si no hay comentarios, mostrar 'No Comments'
+            y += 10; // Espacio adicional después de 'No Comments'
+        }
         y += 10;
 
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
-        const filename = 'ticket_data.pdf';
-        doc.output('dataurlnewwindow', { filename });
+        const timestamp = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+        const filename = `(${idSelect})ticket_${timestamp}.pdf`;
+        doc.save(filename);
 
     }
     // Agregar evento al botón de descarga de PDF

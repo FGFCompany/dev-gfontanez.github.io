@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const subjectCell = document.createElement('td');
         const subjectLink = document.createElement('a');
         subjectLink.textContent = subject;
-        subjectLink.classList.add('subjectSelect', 'hover:underline', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-sky-500', 'dark:text-sky-400');
+        subjectLink.classList.add('subjectSelect', 'hover:underline', 'truncate', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-emerald-500', 'dark:text-emerald-400');
         subjectCell.appendChild(subjectLink);
         subjectCell.style.maxWidth = '150px';
         subjectCell.style.overflow = 'hidden';
@@ -420,6 +420,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const ticketForm = document.getElementById('ticketForm');
 
         // Obtener los valores del formulario
+        const idSelect = String(selectedRow.querySelector('.idSelect').value);
         const fullName = ticketForm.querySelector('#fullName').value;
         const status = ticketForm.querySelector('#status').value;
         const subject = ticketForm.querySelector('#subject').value;
@@ -441,6 +442,10 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.setFontSize(12);
         let y = 44; // Posición inicial en Y
 
+        doc.text('Ticket ID:', 14, y);
+        doc.text(idSelect, 60, y);
+        y += 10;
+
         doc.text('Full Name:', 14, y);
         doc.text(fullName, 60, y);
         y += 10;
@@ -458,12 +463,32 @@ document.addEventListener("DOMContentLoaded", function () {
         y += 10;
 
         doc.text('Comments:', 14, y);
-        doc.text(comments, 60, y);
+        if (Array.isArray(comments)) {
+            comments.forEach(comment => {
+                const bulletX = 60; // Posición X del marcador de viñeta
+                const bulletY = y - 1; // Ajuste para centrar el marcador verticalmente
+                doc.circle(bulletX, bulletY, 1, 'F'); // Dibujar círculo como marcador de viñeta
+                doc.text(comment, 64, y);
+                y += 10; // Espacio entre cada comentario
+            });
+        } else {
+            doc.text(comments, 64, y); // Si no hay comentarios, mostrar 'No Comments'
+            y += 10; // Espacio adicional después de 'No Comments'
+        }
         y += 10;
 
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
-        const filename = 'ticket_data.pdf';
-        doc.output('dataurlnewwindow', { filename });
+        const timestamp = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+        const filename = `(${idSelect})_ticket_${timestamp}.pdf`;
+        doc.save(filename);
 
     }
     // Agregar evento al botón de descarga de PDF
@@ -519,16 +544,20 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Configurar la acción de impresión automática
-        doc.autoPrint();
-
+        // Generar un timestamp
+        const timestamp = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
-        const filename = 'ticket_data.pdf';
-        try {
-            window.open(doc.output('bloburl', { filename: filename }));
-        } catch (error) {
-            doc.save(filename);
-        }
+        const filename = `tickets_table_${timestamp}.pdf`;
+        doc.save(filename);
+
     }
     // Agregar evento al botón de descarga de PDF
     const downloadPdfBtnTable = document.getElementById('downloadPdfBtnTable');
@@ -546,24 +575,75 @@ document.addEventListener("DOMContentLoaded", function () {
         [' '], ['Full Name', 'Subject', 'Status', 'Description']];
         var tableBody = document.getElementById('tbobyTicketTable');
         var rows = tableBody.querySelectorAll('tr');
-        rows.forEach((row, index) => {
-            const cols = row.querySelectorAll('td');
-            if (cols.length > 0) {
-                sheetData.push([
-                    cols[0].textContent,
-                    cols[1].textContent,
-                    cols[2].textContent,
-                    cols[3].textContent
-                ]);
-            }
-        });
-        var ws = XLSX.utils.aoa_to_sheet(sheetData);
-        // Agregar la hoja al libro
-        XLSX.utils.book_append_sheet(workbook, ws, 'Ticket Data');
-        // Guardar el archivo de Excel
-        XLSX.writeFile(workbook, 'ticket_data.xlsx');
-    }
+        var rowsPerPage = 30; // Número de filas por página (ajustable)
+        var totalPages = Math.ceil(rows.length / rowsPerPage);
 
+        function addFooter(sheetData, pageNum, totalPages) {
+            sheetData.push(['Page ' + pageNum + ' of ' + totalPages]);
+        }
+
+        function createSheetData(rows, startRow, endRow, pageNum) {
+            var data = [['Ticket Report Data'],
+            ['Gilberto Fontanez A Software Developer Report'],
+            [' '], ['Full Name', 'Subject', 'Status', 'Description']];
+
+            for (let i = startRow; i < endRow; i++) {
+                const row = rows[i];
+                const cols = row.querySelectorAll('td');
+                if (cols.length > 0) {
+                    data.push([
+                        cols[0].textContent,
+                        cols[1].textContent,
+                        cols[2].textContent,
+                        cols[3].textContent
+                    ]);
+                }
+            }
+
+            addFooter(data, pageNum, totalPages);
+            return data;
+        }
+
+        for (let i = 0; i < totalPages; i++) {
+            let startRow = i * rowsPerPage;
+            let endRow = startRow + rowsPerPage;
+            if (endRow > rows.length) endRow = rows.length;
+
+            var sheetName = 'Page ' + (i + 1);
+            var currentSheetData = createSheetData(rows, startRow, endRow, i + 1);
+            var ws = XLSX.utils.aoa_to_sheet(currentSheetData);
+            // Ajustar el ancho de las columnas
+            ws['!cols'] = [
+                { wch: 20 }, // Ancho de la columna 'Full Name'
+                { wch: 25 }, // Ancho de la columna 'Subject'
+                { wch: 15 }, // Ancho de la columna 'status'
+                { wch: 30 }  // Ancho de la columna 'Description'
+            ];
+            // Aplicar estilo a los encabezados
+            var headerRange = XLSX.utils.decode_range(ws['!ref']);
+            for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+                var cell = ws[XLSX.utils.encode_cell({ r: 3, c: C })]; // La fila 3 es la de los encabezados
+                if (!cell.s) cell.s = {};
+                cell.s.fill = {
+                    patternType: "solid",
+                    fgColor: { rgb: "D3D3D3" } // Color gris claro
+                };
+            }
+            // Agregar la hoja al libro
+            XLSX.utils.book_append_sheet(workbook, ws, 'Ticket Data');
+        }
+        // Guardar el archivo de Excel
+        const timestamp = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+        XLSX.writeFile(workbook, `tickets_table_${timestamp}.xlsx`);
+    }
     // Agregar evento al botón de descarga de Excel
     const downloadExcelBtnTable = document.getElementById('downloadExcelBtnTable');
     downloadExcelBtnTable.addEventListener('click', generateExcelTable);

@@ -230,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const vehicleCell = document.createElement('td');
         const vehicleLink = document.createElement('a');
         vehicleLink.textContent = vehicle;
-        vehicleLink.classList.add('vehicleSelect', 'hover:underline', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-sky-500', 'dark:text-sky-400');
+        vehicleLink.classList.add('vehicleSelect', 'hover:underline', 'px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-emerald-500', 'dark:text-emerald-400');
         vehicleCell.appendChild(vehicleLink);
         vehicleCell.style.maxWidth = '150px';
         vehicleCell.style.overflow = 'hidden';
@@ -459,9 +459,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 y += 10;
             }
         });
+        // Generar un timestamp
+        const timestamp = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
-        const filename = 'vehicle_tracking_data.pdf';
-        doc.output('dataurlnewwindow', { filename });
+        const filename = `vehicles_table_${timestamp}_tracking_data.pdf`;
+        doc.save(filename);
     }
     // Botón de descarga de Table PDF
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
@@ -529,7 +539,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const imgHeight = canvas.height * imgWidth / canvas.width;
             const imgData = canvas.toDataURL('image/png');
             pdf.addImage(imgData, 'PNG', 14, y + 35, imgWidth, imgHeight);
-            const filename = '(' + vehicleFormValue + ')vehicle_' + timeFormValue + '_data.pdf';
+            const filename = `(${vehicleFormValue})vehicle_${timeFormValue}_data.pdf`;
             pdf.save(filename);
         });
     }
@@ -549,22 +559,73 @@ document.addEventListener("DOMContentLoaded", function () {
         [' '], ['Time', 'Vehicle', 'Address', 'Speed']];
         var tableBody = document.getElementById('vehicleData');
         var rows = tableBody.querySelectorAll('tr');
-        rows.forEach((row, index) => {
-            const cols = row.querySelectorAll('td');
-            if (cols.length > 0) {
-                sheetData.push([
-                    cols[0].textContent,
-                    cols[1].textContent,
-                    cols[2].textContent,
-                    cols[3].textContent
-                ]);
+        var rowsPerPage = 30; // Número de filas por página (ajustable)
+        var totalPages = Math.ceil(rows.length / rowsPerPage);
+
+        function addFooter(sheetData, pageNum, totalPages) {
+            sheetData.push(['Page ' + pageNum + ' of ' + totalPages]);
+        }
+
+        function createSheetData(rows, startRow, endRow, pageNum) {
+            var data = [['Vehicle Tracking Data'],
+            ['Gilberto Fontanez A Software Developer Report'],
+            [' '], ['Time', 'Vehicle', 'Address', 'Speed']];
+
+            for (let i = startRow; i < endRow; i++) {
+                const row = rows[i];
+                const cols = row.querySelectorAll('td');
+                if (cols.length > 0) {
+                    data.push([
+                        cols[0].textContent,
+                        cols[1].textContent,
+                        cols[2].textContent,
+                        cols[3].textContent
+                    ]);
+                }
             }
-        });
-        var ws = XLSX.utils.aoa_to_sheet(sheetData);
-        // Agregar la hoja al libro
-        XLSX.utils.book_append_sheet(workbook, ws, 'Vehicle Tracking Data');
+
+            addFooter(data, pageNum, totalPages);
+            return data;
+        }
+
+        for (let i = 0; i < totalPages; i++) {
+            let startRow = i * rowsPerPage;
+            let endRow = startRow + rowsPerPage;
+            if (endRow > rows.length) endRow = rows.length;
+
+            var sheetName = 'Page ' + (i + 1);
+            var currentSheetData = createSheetData(rows, startRow, endRow, i + 1);
+            var ws = XLSX.utils.aoa_to_sheet(currentSheetData);
+            // Ajustar el ancho de las columnas
+            ws['!cols'] = [
+                { wch: 25 }, // Ancho de la columna 'Time'
+                { wch: 15 }, // Ancho de la columna 'Vehicle'
+                { wch: 50 }, // Ancho de la columna 'Address'
+                { wch: 10 }  // Ancho de la columna 'Speed'
+            ];
+            // Aplicar estilo a los encabezados
+            var headerRange = XLSX.utils.decode_range(ws['!ref']);
+            for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+                var cell = ws[XLSX.utils.encode_cell({ r: 3, c: C })]; // La fila 3 es la de los encabezados
+                if (!cell.s) cell.s = {};
+                cell.s.fill = {
+                    patternType: "solid",
+                    fgColor: { rgb: "D3D3D3" } // Color gris claro
+                };
+            }
+            XLSX.utils.book_append_sheet(workbook, ws, sheetName);
+        }
         // Guardar el archivo de Excel
-        XLSX.writeFile(workbook, 'vehicle_tracking_data.xlsx');
+        const timestamp = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+        XLSX.writeFile(workbook, `vehicles_table_${timestamp}_tracking_data.xlsx`);
     }
     // Botón de descarga de Table Excel
     const downloadExcelBtn = document.getElementById('downloadExcelBtn');
