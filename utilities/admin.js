@@ -117,23 +117,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Agregar eventos de sort click a los encabezados para ordenar las columnas
         document.querySelectorAll('th a').forEach(header => {
-            header.addEventListener('click', function (e) {
+            header.addEventListener('click', async function (e) {
                 e.preventDefault();
                 const table = header.closest('table');
                 const index = Array.from(header.closest('tr').children).indexOf(header.closest('th'));
                 const order = header.dataset.order = -(header.dataset.order || -1);
                 const rows = Array.from(table.querySelector('tbody').rows);
 
-                rows.sort((rowA, rowB) => {
+                const sortedRows = rows.sort((rowA, rowB) => {
                     const cellA = rowA.cells[index].innerText;
                     const cellB = rowB.cells[index].innerText;
                     return (cellA > cellB ? 1 : cellA < cellB ? -1 : 0) * order;
                 });
 
                 table.querySelector('tbody').innerHTML = '';
-                rows.forEach(row => {
-                    table.querySelector('tbody').appendChild(row);
-                });
+                for (const row of sortedRows) {
+                    await new Promise(resolve => {
+                        setTimeout(() => {
+                            table.querySelector('tbody').appendChild(row);
+                            resolve();
+                        }, 10);
+                    });
+                }
             });
         });
     }
