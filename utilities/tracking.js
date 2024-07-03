@@ -37,6 +37,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     const database = supabase.createClient('https://svdtdtpqscizmxlcicox.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZHRkdHBxc2Npem14bGNpY294Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY2NTU2ODEsImV4cCI6MjAzMjIzMTY4MX0.9Hkev2jhj11Q6r6DXrf2gpixaVTDj2vODRYwpxB5Y50');
+    // Inicializar EmailJS
+    emailjs.init('XTFEjpctSxusEo9IC');
+    // Inicializar Mapa
     const map = L.map('map').setView([37.7749, -122.4194], 17);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -74,8 +77,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     continue;
                 }
                 const agencyTag = agencyElement.getAttribute('tag');
-                console.log('agencyTag:', agencyTag);
-
                 // Obtener la lista de rutas para la agencia actual
                 const routeListResponse = await fetch(`https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=${agencyTag}`);
                 const routeListData = await routeListResponse.text();
@@ -408,7 +409,55 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    document.getElementById("contactEmail").addEventListener("click", modalContact);
+    async function modalContact(event) {
+        event.preventDefault();
+        const contactEmailLink = document.getElementById('contactEmail');
+        const modal = document.getElementById('static-modal-contact');
+        document.getElementById('contactFullName').value = '';
+        document.getElementById('contactEmailInput').value = '';
+        document.getElementById('contactSubject').value = '';
+        document.getElementById('contactMessage').value = '';
+        modal.style.display = 'flex';
+        // Abrir el modal al hacer clic en el enlace
+        contactEmailLink.addEventListener('click', function (event) {
+            event.preventDefault();
+            modal.classList.remove('hidden'); // Mostrar el modal
+            modal.setAttribute('aria-hidden', 'false');
+            // Enfoque inicial en el modal para accesibilidad
+            modal.focus();
+        });
+        const sendEmailBtn = document.getElementById('sendEmailBtn');
 
+        sendEmailBtn.addEventListener('click', function () {
+            const fullName = document.getElementById('contactFullName').value;
+            const email = document.getElementById('contactEmailInput').value;
+            const subject = document.getElementById('contactSubject').value;
+            const message = document.getElementById('contactMessage').value;
+            // Validar que todos los campos estén llenos
+            if (fullName === '' || email === '' || subject === '' || message === '') {
+                alert('Please fill in all fields for the contact form.');
+                return; // Prevenir el envío del formulario
+            }
+            // Envío del correo
+            emailjs.send('service_fok2l68', 'template_cb4fgdn', {
+                from_name: email,
+                message: 'Name: ' + fullName + '\n\n' + 'Subject: ' + subject + '\n\n' + 'Message:' + '\n\n' + message
+            })
+                .then(response => {
+                    console.log('Email enviado correctamente', response.status, response.text);
+                    modal.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error al enviar el correo', error);
+                });
+        });
+        // Cerrar el modal al hacer clic en el botón de cerrar
+        const closeBtnContact = document.getElementById('closeBtnContact');
+        closeBtnContact.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    };
 
     // Reports 
     async function generatePDF(event) {

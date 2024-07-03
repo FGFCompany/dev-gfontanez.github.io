@@ -38,7 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // DB SupaBase API
     const database = supabase.createClient('https://svdtdtpqscizmxlcicox.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZHRkdHBxc2Npem14bGNpY294Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY2NTU2ODEsImV4cCI6MjAzMjIzMTY4MX0.9Hkev2jhj11Q6r6DXrf2gpixaVTDj2vODRYwpxB5Y50');
-
+    // Inicializar EmailJS
+    emailjs.init('XTFEjpctSxusEo9IC');
 
     // Cargar y mostrar los registros al cargar la página
     loadTableRecords();
@@ -370,6 +371,56 @@ document.addEventListener("DOMContentLoaded", function () {
             document.querySelector('[data-modal-hide="static-modal"]').click();
         }
     };
+    document.getElementById("contactEmail").addEventListener("click", modalContact);
+    async function modalContact(event) {
+        event.preventDefault();
+        const contactEmailLink = document.getElementById('contactEmail');
+        const modal = document.getElementById('static-modal-contact');
+        document.getElementById('contactFullName').value = '';
+        document.getElementById('contactEmailInput').value = '';
+        document.getElementById('contactSubject').value = '';
+        document.getElementById('contactMessage').value = '';
+        modal.style.display = 'flex';
+
+        // Abrir el modal al hacer clic en el enlace
+        contactEmailLink.addEventListener('click', function (event) {
+            event.preventDefault();
+            modal.classList.remove('hidden'); // Mostrar el modal
+            modal.setAttribute('aria-hidden', 'false');
+            // Enfoque inicial en el modal para accesibilidad
+            modal.focus();
+        });
+        const sendEmailBtn = document.getElementById('sendEmailBtn');
+
+        sendEmailBtn.addEventListener('click', function () {
+            const fullName = document.getElementById('contactFullName').value;
+            const email = document.getElementById('contactEmailInput').value;
+            const subject = document.getElementById('contactSubject').value;
+            const message = document.getElementById('contactMessage').value;
+            // Validar que todos los campos estén llenos
+            if (fullName === '' || email === '' || subject === '' || message === '') {
+                alert('Please fill in all fields for the contact form.');
+                return; // Prevenir el envío del formulario
+            }
+            // Envío del correo
+            emailjs.send('service_fok2l68', 'template_cb4fgdn', {
+                from_name: email,
+                message: 'Name: ' + fullName + '\n\n' + 'Subject: ' + subject + '\n\n' + 'Message:' + '\n\n' + message
+            })
+                .then(response => {
+                    console.log('Email enviado correctamente', response.status, response.text);
+                    modal.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error al enviar el correo', error);
+                });
+        });
+        // Cerrar el modal al hacer clic en el botón de cerrar
+        const closeBtnContact = document.getElementById('closeBtnContact');
+        closeBtnContact.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    };
 
 
     // Función para suscribirse a los cambios en tiempo real de la tabla "ticket"
@@ -419,18 +470,38 @@ document.addEventListener("DOMContentLoaded", function () {
         const doc = new jsPDF();
         const ticketForm = document.getElementById('ticketForm');
 
-        // Obtener los valores del formulario
+        // Obtener los valores del formulario y otros datos
         const idSelect = String(selectedRow.querySelector('.idSelect').value);
         const fullName = ticketForm.querySelector('#fullName').value;
         const status = ticketForm.querySelector('#status').value;
         const subject = ticketForm.querySelector('#subject').value;
         const description = ticketForm.querySelector('#description').value;
-
-        // Obtener los comentarios
         const commentList = ticketForm.querySelector('#readcomments ul');
         const comments = commentList ? Array.from(commentList.querySelectorAll('li')).map(li => li.textContent) : 'No Comments';
 
-        // Configurar estilos y título
+        // Función para agregar texto con envoltura y manejar paginación
+        function addWrappedText(doc, text, x, y, maxWidth) {
+            const lines = doc.splitTextToSize(text, maxWidth);
+            lines.forEach(line => {
+                y = checkPageHeight(doc, y); // Verificar si se alcanza el final de la página
+                doc.text(line, x, y);
+                y += 10;
+            });
+            return y;
+        }
+
+        // Función para verificar y manejar el cambio de página
+        function checkPageHeight(doc, y) {
+            const pageHeight = doc.internal.pageSize.height;
+            if (y + 10 > pageHeight - 20) {
+                doc.addPage();
+                return 20; // Reiniciar la posición Y para la nueva página
+            }
+            return y;
+        }
+
+        // Agregar los datos del formulario al PDF
+        let y = 44; // Posición inicial en Y
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
         doc.text('Ticket Data', 14, 22);
@@ -438,44 +509,59 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.setFont('helvetica', 'normal');
         doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
 
-        // Agregar los datos del formulario al PDF
-        doc.setFontSize(12);
-        let y = 44; // Posición inicial en Y
+        doc.setFont('helvetica', 'bold');
+        y = addWrappedText(doc, `Ticket ID:`, 14, y, 150);
+        doc.setFont('helvetica', 'normal');
+        y = addWrappedText(doc, `${idSelect}`, 50, y - 10, 140);
 
-        doc.text('Ticket ID:', 14, y);
-        doc.text(idSelect, 60, y);
-        y += 10;
+        doc.setFont('helvetica', 'bold');
+        y = addWrappedText(doc, `Full Name:`, 14, y, 150);
+        doc.setFont('helvetica', 'normal');
+        y = addWrappedText(doc, `${fullName}`, 50, y - 10, 140);
 
-        doc.text('Full Name:', 14, y);
-        doc.text(fullName, 60, y);
-        y += 10;
+        doc.setFont('helvetica', 'bold');
+        y = addWrappedText(doc, `Status:`, 14, y, 150);
+        doc.setFont('helvetica', 'normal');
+        y = addWrappedText(doc, `${status}`, 50, y - 10, 140);
 
-        doc.text('status:', 14, y);
-        doc.text(status, 60, y);
-        y += 10;
+        doc.setFont('helvetica', 'bold');
+        y = addWrappedText(doc, `Subject:`, 14, y, 150);
+        doc.setFont('helvetica', 'normal');
+        y = addWrappedText(doc, `${subject}`, 50, y - 10, 140);
 
-        doc.text('Subject:', 14, y);
-        doc.text(subject, 60, y);
-        y += 10;
+        doc.setFont('helvetica', 'bold');
+        y = addWrappedText(doc, `Description:`, 14, y, 150);
+        doc.setFont('helvetica', 'normal');
+        y = addWrappedText(doc, `${description}`, 50, y - 10, 140);
 
-        doc.text('Description:', 14, y);
-        doc.text(description, 60, y);
-        y += 10;
+        doc.setFont('helvetica', 'bold');
+        y = addWrappedText(doc, `Comments:`, 14, y, 150);
+        doc.setFont('helvetica', 'normal');
 
-        doc.text('Comments:', 14, y);
+
+        // Manejar los comentarios
         if (Array.isArray(comments)) {
             comments.forEach(comment => {
-                const bulletX = 60; // Posición X del marcador de viñeta
-                const bulletY = y - 1; // Ajuste para centrar el marcador verticalmente
-                doc.circle(bulletX, bulletY, 1, 'F'); // Dibujar círculo como marcador de viñeta
-                doc.text(comment, 64, y);
-                y += 10; // Espacio entre cada comentario
+                y = checkPageHeight(doc, y); // Verificar si se alcanza el final de la página
+                const bulletX = 14; // Posición X del marcador de viñeta
+                const bulletY = y; // Ajuste para centrar el marcador verticalmente
+                doc.circle(bulletX - 2, bulletY - 1, 1, 'F'); // Dibujar círculo como marcador de viñeta
+                y = addWrappedText(doc, comment, bulletX + 4, y, 180);
             });
         } else {
-            doc.text(comments, 64, y); // Si no hay comentarios, mostrar 'No Comments'
-            y += 10; // Espacio adicional después de 'No Comments'
+            y = addWrappedText(doc, comments, 14, y, 150); // Si no hay comentarios, mostrar 'No Comments'
         }
-        y += 10;
+
+        // Obtener el número total de páginas
+        const totalPages = doc.internal.getNumberOfPages();
+
+        // Iterar sobre cada página para agregar el número de página
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Page ${i} of ${totalPages}`, doc.internal.pageSize.width - 20, doc.internal.pageSize.height - 10, { align: 'right' });
+        }
 
         // Abrir el documento PDF en una nueva pestaña o ventana del navegador
         const timestamp = new Date().toLocaleString('en-US', {
@@ -489,8 +575,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         const filename = `(${idSelect})_ticket_${timestamp}.pdf`;
         doc.save(filename);
-
     }
+
     // Agregar evento al botón de descarga de PDF
     const ticketSelectedPdfBtn = document.getElementById('ticketSelectedPdfBtn');
     ticketSelectedPdfBtn.addEventListener('click', generatePDFTicket);
@@ -503,7 +589,45 @@ document.addEventListener("DOMContentLoaded", function () {
         const doc = new jsPDF();
         const tableBody = document.getElementById('tbobyTicketTable');
 
-        // Configurar estilos y título
+        // Función para dibujar encabezados
+        const drawTableHeaders = (y) => {
+            doc.setDrawColor(0); // Color del borde (negro)
+            doc.setFillColor(200); // Color de fondo (gris claro)
+            doc.setLineWidth(0.1); // Ancho del borde
+
+            doc.rect(14, y, 40, 8, 'FD'); // Rectángulo para 'Full Name'
+            doc.rect(54, y, 40, 8, 'FD'); // Rectángulo para 'Subject'
+            doc.rect(94, y, 30, 8, 'FD'); // Rectángulo para 'status'
+            doc.rect(124, y, 70, 8, 'FD'); // Rectángulo para 'Description'
+
+            doc.text('Full Name', 16, y + 5); // Texto para 'Full Name'
+            doc.text('Subject', 56, y + 5); // Texto para 'Subject'
+            doc.text('Status', 96, y + 5); // Texto para 'status'
+            doc.text('Description', 126, y + 5); // Texto para 'Description'
+        };
+
+        // Función para agregar texto con envoltura y manejar paginación
+        function addWrappedText(text, x, y, maxWidth) {
+            const lines = doc.splitTextToSize(text, maxWidth);
+            lines.forEach(line => {
+                y = checkPageHeight(y); // Verificar si se alcanza el final de la página
+                doc.text(line, x, y);
+                y += 5;
+            });
+            return y;
+        }
+
+        // Función para verificar y manejar el cambio de página
+        function checkPageHeight(y) {
+            const pageHeight = doc.internal.pageSize.height;
+            if (y + 10 > pageHeight - 20) {
+                doc.addPage();
+                return 30; // Reiniciar la posición Y para el contenido en la nueva página
+            }
+            return y;
+        }
+
+        // Configurar estilos y título inicial
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
         doc.text('Ticket Data', 14, 22);
@@ -511,38 +635,54 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.setFont('helvetica', 'normal');
         doc.text('Gilberto Fontanez A Software Developer Report', 14, 28);
 
-        // Agregar encabezados con estilo
-        doc.setFontSize(10);
-        let y = 40; // Posición inicial en Y
+        let y = 30; // Posición inicial en Y para el contenido del Table Headers
 
-        doc.setDrawColor(0); // Color del borde (negro)
-        doc.setFillColor(200); // Color de fondo (gris claro)
-        doc.setLineWidth(0.1); // Ancho del borde
+        // Dibujar encabezados en la primera página
+        drawTableHeaders(y);
 
-        doc.rect(14, y, 40, 8, 'FD'); // Rectángulo para 'Full Name'
-        doc.rect(54, y, 40, 8, 'FD'); // Rectángulo para 'Subject'
-        doc.rect(94, y, 30, 8, 'FD'); // Rectángulo para 'status'
-        doc.rect(124, y, 60, 8, 'FD'); // Rectángulo para 'Description'
-
-        doc.text('Full Name', 16, y + 5); // Texto para 'Full Name'
-        doc.text('Subject', 56, y + 5); // Texto para 'Subject'
-        doc.text('Status', 96, y + 5); // Texto para 'status'
-        doc.text('Description', 126, y + 5); // Texto para 'Description'
-
-        y += 15;
+        y += 20; // Posición inicial en Y para el contenido de la primera fila row
 
         // Crear tabla en el PDF
         const rows = tableBody.querySelectorAll('tr');
-        rows.forEach((row, index) => {
+        let currentRow = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
             const cols = row.querySelectorAll('td');
             if (cols.length > 0) {
-                doc.text(cols[0].textContent, 16, y);
-                doc.text(cols[1].textContent, 56, y);
-                doc.text(cols[2].textContent, 96, y);
-                doc.text(cols[3].textContent, 126, y);
-                y += 8;
+                // Añadir texto con envoltura para cada columna
+                let x = 16; // Posición inicial en X para la primera columna
+
+                const text1 = cols[0].textContent;
+                y = addWrappedText(text1, x, y - 5, 40);
+
+                const text2 = cols[1].textContent;
+                y = addWrappedText(text2, x + 40, y - 5, 40);
+
+                const text3 = cols[2].textContent;
+                y = addWrappedText(text3, x + 80, y - 5, 30);
+
+                const text4 = cols[3].textContent;
+                y = addWrappedText(text4, x + 110, y - 5, 60);
+
+                currentRow++;
+                // Añadir espacio filas de rows 
+                if (currentRow < rows.length) {
+                    y += 10; // Añadir espacio entre filas
+                }
             }
-        });
+        }
+
+        // Numeración de páginas
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            if (i > 1) { // Dibujar encabezados solo a partir de la segunda página
+                drawTableHeaders(10);
+            }
+            doc.setFontSize(10);
+            doc.text(`Page ${i} of ${totalPages}`, doc.internal.pageSize.getWidth() - 50, doc.internal.pageSize.getHeight() - 10);
+        }
 
         // Generar un timestamp
         const timestamp = new Date().toLocaleString('en-US', {
@@ -554,11 +694,12 @@ document.addEventListener("DOMContentLoaded", function () {
             second: '2-digit',
             hour12: true
         });
-        // Abrir el documento PDF en una nueva pestaña o ventana del navegador
+
+        // Guardar y abrir el documento PDF en una nueva pestaña o ventana del navegador
         const filename = `tickets_table_${timestamp}.pdf`;
         doc.save(filename);
-
     }
+
     // Agregar evento al botón de descarga de PDF
     const downloadPdfBtnTable = document.getElementById('downloadPdfBtnTable');
     downloadPdfBtnTable.addEventListener('click', generatePDFTable);
