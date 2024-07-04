@@ -758,16 +758,16 @@ video {
   margin-bottom: 1.75rem;
 }
 
+.mb-16 {
+  margin-bottom: 4rem;
+}
+
 .mb-2 {
   margin-bottom: 0.5rem;
 }
 
 .mb-4 {
   margin-bottom: 1rem;
-}
-
-.mb-5 {
-  margin-bottom: 1.25rem;
 }
 
 .mb-6 {
@@ -955,6 +955,10 @@ video {
 
 .h-\[calc\(100\%-1rem\)\] {
   height: calc(100% - 1rem);
+}
+
+.h-full {
+  height: 100%;
 }
 
 .max-h-\[600px\] {
@@ -3137,6 +3141,10 @@ element::-webkit-scrollbar {
     margin-top: 0.75rem;
   }
 
+  .max-sm\:block {
+    display: block;
+  }
+
   .max-sm\:inline-block {
     display: inline-block;
   }
@@ -3224,11 +3232,6 @@ element::-webkit-scrollbar {
 
   .sm\:text-lg {
     font-size: 1.125rem;
-    line-height: 1.75rem;
-  }
-
-  .sm\:text-xl {
-    font-size: 1.25rem;
     line-height: 1.75rem;
   }
 
@@ -3376,6 +3379,11 @@ element::-webkit-scrollbar {
   .lg\:px-6 {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+  }
+
+  .lg\:py-14 {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
   }
 
   .lg\:py-16 {

@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     async function modalContact(event) {
         event.preventDefault();
         const contactEmailLink = document.getElementById('contactEmail');
-        const modal = document.getElementById('static-modal-contact');
+        const modal = document.getElementById('modal-contact');
         document.getElementById('contactFullName').value = '';
         document.getElementById('contactEmailInput').value = '';
         document.getElementById('contactSubject').value = '';

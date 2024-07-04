@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch('https://retro.umoiq.com/service/publicXMLFeed?command=agencyList');
             const data = await response.text();
             const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
-            const defaultAgencies = ['jhu-apl', 'ccrta', 'chapel-hill', 'dumbarton-gtfs'];
+            const defaultAgencies = ['jhu-apl', 'ccrta', 'chapel-hill', 'dumbarton-gtfs','ttc'];
             // Other default agencies: 'ttc',
 
             let routeListToHTML = '';
