@@ -61,9 +61,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // Función para obtener la lista de agencias y rutas
     async function getAgencyAndRouteList() {
         try {
-            const response = await fetch('https://retro.umoiq.com/service/publicXMLFeed?command=agencyList');
-            const data = await response.text();
-            const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
+            const agencyListUrl = 'https://retro.umoiq.com/service/publicXMLFeed?command=agencyList';
+            const headers = {
+                "Accept-Encoding": "gzip, deflate"
+            };
+            const agencyListResponse = await fetch(agencyListUrl, {headers});
+            const agencyListData = await agencyListResponse.text();
+            const agencyXmlDoc = new DOMParser().parseFromString(agencyListData, "text/xml");
             const defaultAgencies = ['jhu-apl', 'ccrta', 'chapel-hill', 'dumbarton-gtfs','ttc'];
             // Other default agencies: 'ttc',
 
@@ -71,14 +75,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             for (const agency of defaultAgencies) {
                 // Obtener el tag de la agencia actual
-                const agencyElement = Array.from(xmlDoc.getElementsByTagName('agency')).find(el => el.getAttribute('tag') === agency);
+                const agencyElement = Array.from(agencyXmlDoc.getElementsByTagName('agency')).find(el => el.getAttribute('tag') === agency);
                 if (!agencyElement) {
                     console.warn(`Agency with tag ${agency} not found.`);
                     continue;
                 }
                 const agencyTag = agencyElement.getAttribute('tag');
                 // Obtener la lista de rutas para la agencia actual
-                const routeListResponse = await fetch(`https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=${agencyTag}`);
+                const routeListUrl = `https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=${agencyTag}`;
+                const routeListResponse = await fetch(routeListUrl, {headers});
                 const routeListData = await routeListResponse.text();
                 const routeXmlDoc = new DOMParser().parseFromString(routeListData, "text/xml");
                 const routes = routeXmlDoc.getElementsByTagName('route');
@@ -106,12 +111,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
             const vehicleLocationUrl = `https://retro.umoiq.com/service/publicXMLFeed?command=vehicleLocations&a=${agencyTag}&r=${selectedRouteTag}&t=${lastTime}`;
-            const response = await fetch(vehicleLocationUrl);
-            const data = await response.text();
-            const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
-
-            const vehicles = xmlDoc.getElementsByTagName('vehicle');
+            const headers = {
+                "Accept-Encoding": "gzip, deflate"
+            };
+            const vehicleLocationResponse = await fetch(vehicleLocationUrl, {headers});
+            const vehicleLocationData = await vehicleLocationResponse.text();
+            const vehicleLocationXmlDoc = new DOMParser().parseFromString(vehicleLocationData, "text/xml");
+            const vehicles = vehicleLocationXmlDoc.getElementsByTagName('vehicle');
             let vehicleListToHTML = '';
+
             if (vehicles.length > 0) {
                 vehicleListToHTML = '<option value="">Select Vehicle...</option>';
                 for (let i = 0; i < vehicles.length; i++) {
@@ -134,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
             vehicleList.innerHTML = vehicleListToHTML;
 
             // Actualizar el último tiempo (lastTime)
-            const lastTimeElement = xmlDoc.getElementsByTagName('lastTime')[0];
+            const lastTimeElement = vehicleLocationXmlDoc.getElementsByTagName('lastTime')[0];
             if (lastTimeElement) {
                 lastTime = lastTimeElement.getAttribute('time');
             }
@@ -151,17 +159,19 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const vehicleLocationUrl = `https://retro.umoiq.com/service/publicXMLFeed?command=vehicleLocation&a=${agencyTag}&v=${selectedVehicleId}`;
-            const response = await fetch(vehicleLocationUrl);
-            const data = await response.text();
-            const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
+            const vehicleSelectedUrl = `https://retro.umoiq.com/service/publicXMLFeed?command=vehicleLocation&a=${agencyTag}&v=${selectedVehicleId}`;
+            const headers = {
+                "Accept-Encoding": "gzip, deflate"
+            };
+            const vehicleSelectedResponse = await fetch(vehicleSelectedUrl, {headers});
+            const vehicleSelectedData = await vehicleSelectedResponse.text();
+            const vehicleSelectedXmlDoc = new DOMParser().parseFromString(vehicleSelectedData, "text/xml");
+            const vehicleSelected = vehicleSelectedXmlDoc.getElementsByTagName('vehicle')[0];
 
-            const vehicle = xmlDoc.getElementsByTagName('vehicle')[0];
-
-            if (vehicle) {
-                const lat = parseFloat(vehicle.getAttribute('lat'));
-                const lon = parseFloat(vehicle.getAttribute('lon'));
-                const speed = vehicle.getAttribute('speedKmHr');
+            if (vehicleSelected) {
+                const lat = parseFloat(vehicleSelected.getAttribute('lat'));
+                const lon = parseFloat(vehicleSelected.getAttribute('lon'));
+                const speed = vehicleSelected.getAttribute('speedKmHr');
 
                 const popupContent = `<b>Vehicle:</b> ${selectedVehicleId}<br><b>Speed:</b> ${speed} km/h`;
 

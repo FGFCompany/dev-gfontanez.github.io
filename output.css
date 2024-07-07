@@ -3476,6 +3476,10 @@ element::-webkit-scrollbar {
 }
 
 @media (prefers-color-scheme: dark) {
+  .dark\:hidden {
+    display: none;
+  }
+
   .dark\:divide-gray-600 > :not([hidden]) ~ :not([hidden]) {
     --tw-divide-opacity: 1;
     border-color: rgb(75 85 99 / var(--tw-divide-opacity));
@@ -3609,6 +3613,12 @@ element::-webkit-scrollbar {
   .dark\:focus\:ring-gray-800:focus {
     --tw-ring-opacity: 1;
     --tw-ring-color: rgb(31 41 55 / var(--tw-ring-opacity));
+  }
+
+  @media (min-width: 1024px) {
+    .dark\:lg\:flex {
+      display: flex;
+    }
   }
 }
 
