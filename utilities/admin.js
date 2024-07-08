@@ -53,14 +53,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     yaxis: {
                         labels: {
                             formatter: function (value) {
-                                return value + "%"
+                                return value + " Records"
                             },
                         },
                     },
                     xaxis: {
                         labels: {
                             formatter: function (value) {
-                                return value + "%"
+                                return value + " Records"
                             },
                         },
                         axisTicks: {
@@ -117,14 +117,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     yaxis: {
                         labels: {
                             formatter: function (value) {
-                                return value + "%"
+                                return value + " Tickets"
                             },
                         },
                     },
                     xaxis: {
                         labels: {
                             formatter: function (value) {
-                                return value + "%"
+                                return value + " Tickets"
                             },
                         },
                         axisTicks: {

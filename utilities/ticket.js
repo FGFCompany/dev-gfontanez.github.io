@@ -314,7 +314,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const description = document.getElementById('description').value;
         // Verificar si los campos no están vacíos
         if (!fullName || !status || !subject || !description) {
-            console.error('Todos los campos deben ser completados.');
+            alert('All fields are required for New Ticket.');
             return;
         }
         try {
