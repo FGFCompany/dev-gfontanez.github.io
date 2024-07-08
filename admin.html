@@ -75,9 +75,39 @@
     <!-- Start block -->
     <main class="flex-grow bg-gray-50 dark:bg-gray-800">
         <div class="max-w-screen-xl px-4 pt-20 max-sm:pt-16 mb-4 mx-auto">
-            <!-- Row -->
+            <!-- Start Charts -->
             <div class="gap-8 max-sm:mt-3 lg:grid lg:grid-cols-2 xl:gap-16">
-
+                <!-- Start Pie -->
+                <div class="w-full p-2 rounded mb-8 max-sm:mb-4 bg-white dark:bg-gray-900">
+                    <div class="flex justify-between mb-3">
+                        <div class="flex justify-center items-center">
+                            <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">Tracking
+                                Traffic</h5>
+                        </div>
+                    </div>
+                    <div class="max-sm:pt-8 mt-3 border-t border-gray-200 dark:border-gray-700">
+                    </div>
+                    <!-- Pie Chart -->
+                    <div class="py-6 max-sm:py-0 max-sm:pb-6 text-gray-900 dark:text-white" id="pie-chart"></div>
+                </div>
+                <!-- End Pie -->
+                 <!-- Start Donut -->
+                <div class="w-full p-2 rounded mb-8 max-sm:mb-4 bg-white dark:bg-gray-900">
+                    <div class="flex justify-between mb-3">
+                        <div class="flex justify-center items-center">
+                            <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">Tickets
+                                Traffic</h5>
+                        </div>
+                    </div>
+                    <div class="max-sm:pt-8 mt-3 border-t border-gray-200 dark:border-gray-700">
+                    </div>
+                    <!-- Donut Chart -->
+                    <div class="py-6 text-gray-900 dark:text-white" id="donut-chart"></div>
+                </div>
+                <!-- End Donut -->
+            </div>
+            <!-- Row -->
+            <div class="gap-8 max-sm:mt-10 lg:grid lg:grid-cols-2 xl:gap-16">
                 <!-- Table 1 -->
                 <div class="max-sm:mb-20 text-gray-500 sm:text-lg dark:text-gray-400">
                     <h2 class="mb-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Users Tracking
@@ -99,7 +129,7 @@
                                 1: </span>
                             <!-- Select -->
                             <select id="usersTracking"
-                                class="pl-2 mb-2 text-lg block w-full font-medium text-gray-900 bg-transparent border border-gray-200 rounded focus:outline-none hover:bg-gray-100 hover:text-emerald-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                                class="pl-2 mb-2 text-lg block w-full font-medium text-gray-900 bg-transparent border border-gray-200 rounded focus:outline-none hover:bg-gray-100 hover:text-emerald-700 focus:z-50 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                                 <option value="">Select a Tracking User...</option>
                             </select>
                         </div>
@@ -181,7 +211,7 @@
                     <!-- Extras -->
                     <div class="space-y-4 mb-4 sm:flex sm:space-y-0 sm:space-x-4">
                         <button id="userTrackingtablePDFBtn"
-                            class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+                            class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800 bg-gray-100 dark:bg-gray-900">
                             <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"
                                 fill="red">
                                 <path
@@ -190,7 +220,7 @@
                             Tracking Table PDF
                         </button>
                         <button id="userTrackingtableEXCELBtn"
-                            class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+                            class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800 bg-gray-100 dark:bg-gray-900">
                             <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
                                 fill="green">
                                 <path
@@ -224,7 +254,7 @@
                                 1: </span>
                             <!-- Select -->
                             <select id="usersTicket"
-                                class="pl-2 mb-2 text-lg block w-full font-medium text-gray-900 bg-transparent border border-gray-200 rounded focus:outline-none hover:bg-gray-100 hover:text-emerald-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                                class="pl-2 mb-2 text-lg block w-full font-medium text-gray-900 bg-transparent border border-gray-200 rounded focus:outline-none hover:bg-gray-100 hover:text-emerald-700 focus:z-50 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                                 <option value="">Select a Ticket User...</option>
                             </select>
                         </div>
@@ -306,7 +336,7 @@
                     <!-- Extras -->
                     <div class="space-y-4 mb-4 sm:flex sm:space-y-0 sm:space-x-4">
                         <button id="userTickettablePDFBtn"
-                            class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+                            class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800 bg-gray-100 dark:bg-gray-900">
                             <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"
                                 fill="red">
                                 <path
@@ -315,7 +345,7 @@
                             Ticket Table PDF
                         </button>
                         <button id="userTickettableEXCELBtn"
-                            class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+                            class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-center text-gray-900 border border-gray-200 rounded-lg sm:w-auto hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800 bg-gray-100 dark:bg-gray-900">
                             <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
                                 fill="green">
                                 <path
@@ -358,7 +388,7 @@
 
 
     <!-- Main modal -->
-    <div id="static-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
+    <div id="static-modal" tabindex="-1" aria-hidden="true"
         class="hidden backdrop-blur overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative p-4 w-4/6 max-sm:w-full max-h-full">
             <!-- Modal content -->
@@ -372,7 +402,7 @@
                     </h3>
                     <button type="button"
                         class="text-gray-900 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:text-white dark:hover:text-emerald-500"
-                        data-modal-hide="static-modal" id="closeBtnTracking">
+                         id="closeBtnTracking">
                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -447,7 +477,7 @@
 
 
     <!-- Main modal Ticket -->
-    <div id="static-modal-ticket" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
+    <div id="static-modal-ticket" tabindex="-1" aria-hidden="true"
         class="hidden backdrop-blur overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative p-4 w-4/6 max-sm:w-full max-h-full">
             <!-- Modal content -->
@@ -461,7 +491,7 @@
                     </h3>
                     <button type="button"
                         class="text-gray-900 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:text-white dark:hover:text-emerald-500"
-                        data-modal-hide="static-modal-ticket" id="closeBtnTicket">
+                         id="closeBtnTicket">
                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -499,7 +529,7 @@
                             <label for="status"
                                 class="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Status</label>
                             <select id="status" name="status"
-                                class="w-full mb-2 pl-2 text-lg block font-medium text-gray-900 bg-transparent border border-gray-300 rounded focus:outline-none hover:bg-gray-100 hover:text-emerald-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                                class="w-full mb-2 pl-2 text-lg block font-medium text-gray-900 bg-transparent border border-gray-300 rounded focus:outline-none hover:bg-gray-100 hover:text-emerald-700 focus:z-50 focus:ring-4 focus:ring-gray-200 dark:bg-emerald-600 dark:focus:ring-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                                 required>
                                 <option value="Open">Open</option>
                                 <option value="Close">Close</option>
@@ -558,7 +588,7 @@
     </div>
 
     <!-- Main modal Contact -->
-    <div id="static-modal-contact" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
+    <div id="static-modal-contact" tabindex="-1" aria-hidden="true"
         class="hidden backdrop-blur overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative p-4 w-4/6 max-sm:w-full max-h-full">
             <!-- Modal content -->
@@ -572,7 +602,7 @@
                     </h3>
                     <button type="button"
                         class="text-gray-900 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:text-white dark:hover:text-emerald-500"
-                        data-modal-hide="static-modal-contact" id="closeBtnContact">
+                         id="closeBtnContact">
                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -629,6 +659,7 @@
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.3/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>

@@ -340,7 +340,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 addDataRow(insertedRecord.fullName, insertedRecord.status, insertedRecord.subject, insertedRecord.description, insertedRecord.id);
                 // Resetear el formulario
                 document.getElementById('ticketForm').reset();
-                document.querySelector('[data-modal-hide="static-modal"]').click();
+                document.getElementById('static-modal').style.display = 'none';
             } else {
                 console.error('Error al insertar el registro.');
             }
@@ -368,7 +368,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error('Error updating data in Supabase:', error);
         } else {
             // Cerrar el modal
-            document.querySelector('[data-modal-hide="static-modal"]').click();
+            document.getElementById('static-modal').style.display = 'none';
         }
     };
     document.getElementById("contactEmail").addEventListener("click", modalContact);

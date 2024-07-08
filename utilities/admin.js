@@ -4,12 +4,167 @@ document.addEventListener("DOMContentLoaded", function () {
     // Inicializar EmailJS
     emailjs.init('XTFEjpctSxusEo9IC');
 
+    chartsUsersTracking()
+    chartsUsersTicket()
 
     // Call the functions to load the information
     loadUsersTracking();
     loadUsersTicket();
     let selectedUserTracking = null;
     let selectedUserTicket = null;
+
+
+
+    async function chartsUsersTracking() {
+        const { data: dbChartUsersTracking, error } = await database
+            .rpc('get_tempuserstracking_request');
+
+        if (error) {
+            console.error('Error fetching data:', error);
+        } else {
+            // Transformar los datos según el formato esperado por Lightweight Charts (para gráfico de barras)
+            const chartUsers = dbChartUsersTracking.map(item => item.tempuser)
+            const chartRequest = dbChartUsersTracking.map(item => item.count)
+
+            const getChartOptions = () => {
+                const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                const color = theme === 'dark' ? '#FFFFFF' : 'rgb(55, 61, 63)';
+                return {
+                    series: chartRequest,
+                    chart: {
+                        height: 420,
+                        width: "100%",
+                        type: "pie",
+                    },
+                    labels: chartUsers,
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '12px',
+                            fontFamily: 'Helvetica, Arial, sans-serif',
+                            fontWeight: 400,
+                            colors: [color],
+                        },
+                    },
+                    legend: {
+                        show: true,
+                        colors: [color],
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function (value) {
+                                return value + "%"
+                            },
+                        },
+                    },
+                    xaxis: {
+                        labels: {
+                            formatter: function (value) {
+                                return value + "%"
+                            },
+                        },
+                        axisTicks: {
+                            show: false,
+                        },
+                        axisBorder: {
+                            show: false,
+                        },
+                    },
+                }
+            }
+
+            if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
+                const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());
+                chart.render();
+            }
+
+
+        }
+    }
+
+
+    async function chartsUsersTicket() {
+        const { data: dbChartUsersTicket, error } = await database.rpc('get_tempusersticket_request');
+        if (error) {
+            console.error('Error fetching data:', error);
+        } else {
+            const chartUsers = dbChartUsersTicket.map(item => item.tempuser);
+            const chartRequest = dbChartUsersTicket.map(item => item.count);
+            const getChartOptions = () => {
+                const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                const color = theme === 'dark' ? '#FFFFFF' : 'rgb(55, 61, 63)';
+                return {
+                    series: chartRequest,
+                    chart: {
+                        height: 420,
+                        width: "100%",
+                        type: "donut",
+                    },
+                    labels: chartUsers,
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '12px',
+                            fontFamily: 'Helvetica, Arial, sans-serif',
+                            fontWeight: 400,
+                            colors: [color],
+                        },
+                    },
+                    legend: {
+                        show: true,
+                        colors: [color],
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function (value) {
+                                return value + "%"
+                            },
+                        },
+                    },
+                    xaxis: {
+                        labels: {
+                            formatter: function (value) {
+                                return value + "%"
+                            },
+                        },
+                        axisTicks: {
+                            show: false,
+                        },
+                        axisBorder: {
+                            show: false,
+                        },
+                    },
+                }
+            };
+
+            if (document.getElementById("donut-chart") && typeof ApexCharts !== 'undefined') {
+                const chart = new ApexCharts(document.getElementById("donut-chart"), getChartOptions());
+                chart.render();
+
+                // Función para manejar el cambio de checkboxes
+                function handleCheckboxChange(event, chart) {
+                    const checkbox = event.target;
+                    if (checkbox.checked) {
+                        // Lógica para actualizar según el checkbox seleccionado, si aplica
+                    } else {
+                        // Restaurar datos originales si el checkbox se deselecciona
+                        chart.updateSeries(chartRequest); // Usar los datos originales
+                    }
+                }
+
+                // Obtener todos los checkboxes por su clase
+                const checkboxes = document.querySelectorAll('#devices input[type="checkbox"]');
+
+                // Adjuntar el event listener a cada checkbox
+                checkboxes.forEach((checkbox) => {
+                    checkbox.addEventListener('change', (event) => handleCheckboxChange(event, chart));
+                });
+            }
+        }
+    }
+
+
+
 
     // Event listener for the change event on the select element Tracking
     document.getElementById('usersTracking').addEventListener('change', function () {
@@ -462,7 +617,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error('Error updating data in Supabase:', error);
         } else {
             // Cerrar el modal
-            document.querySelector('[data-modal-hide="static-modal-ticket"]').click();
+            document.getElementById('static-modal-ticket').style.display = 'none';
         }
     };
 
