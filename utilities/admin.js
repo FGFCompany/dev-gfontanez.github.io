@@ -73,16 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
             if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
                 const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());
-                chart.render().then(() => {
-                    const legendContainer = document.querySelector("#pie-chart .apexcharts-legend");
-                    if (legendContainer) {
-                        const usernameLabel = document.createElement("div");
-                        usernameLabel.style.paddingRight = "50px";
-                        usernameLabel.className = "text-gray-900 dark:text-white font-bold text-right w-full"; 
-                        usernameLabel.textContent = "Usernames:";
-                        legendContainer.parentNode.appendChild(usernameLabel);
-                    }
-                });
+                chart.render();
             }
         }
     }
@@ -144,16 +135,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (document.getElementById("donut-chart") && typeof ApexCharts !== 'undefined') {
                 const chart = new ApexCharts(document.getElementById("donut-chart"), getChartOptions());
-                chart.render().then(() => {
-                    const legendContainer = document.querySelector("#donut-chart .apexcharts-legend");
-                    if (legendContainer) {
-                        const usernameLabel = document.createElement("div");
-                        usernameLabel.style.paddingRight = "50px";
-                        usernameLabel.className = "text-gray-900 dark:text-white font-bold text-right w-full"; 
-                        usernameLabel.textContent = "Usernames:";
-                        legendContainer.parentNode.appendChild(usernameLabel);
-                    }
-                });
+                chart.render();
 
                 // Función para manejar el cambio de checkboxes
                 function handleCheckboxChange(event, chart) {
