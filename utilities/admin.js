@@ -16,16 +16,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     async function chartsUsersTracking() {
-        const { data: dbChartUsersTracking, error } = await database
-            .rpc('get_tempuserstracking_request');
-
+        const { data: dbChartUsersTracking, error } = await database.rpc('get_tempuserstracking_request');
+    
         if (error) {
             console.error('Error fetching data:', error);
         } else {
-            // Transformar los datos según el formato esperado por Lightweight Charts (para gráfico de barras)
-            const chartUsers = dbChartUsersTracking.map(item => item.tempuser)
-            const chartRequest = dbChartUsersTracking.map(item => item.count)
-
+            const chartUsers = dbChartUsersTracking.map(item => item.tempuser);
+            const chartRequest = dbChartUsersTracking.map(item => item.count);
+    
             const getChartOptions = () => {
                 const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                 const color = theme === 'dark' ? '#FFFFFF' : 'rgb(55, 61, 63)';
@@ -53,14 +51,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     yaxis: {
                         labels: {
                             formatter: function (value) {
-                                return value + " Records"
+                                return value + " Records";
                             },
                         },
                     },
                     xaxis: {
                         labels: {
                             formatter: function (value) {
-                                return value + " Records"
+                                return value + " Records";
                             },
                         },
                         axisTicks: {
@@ -70,15 +68,22 @@ document.addEventListener("DOMContentLoaded", function () {
                             show: false,
                         },
                     },
-                }
-            }
-
+                };
+            };
+    
             if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
                 const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());
-                chart.render();
+                chart.render().then(() => {
+                    const legendContainer = document.querySelector("#pie-chart .apexcharts-legend");
+                    if (legendContainer) {
+                        const usernameLabel = document.createElement("div");
+                        usernameLabel.style.paddingRight = "50px";
+                        usernameLabel.className = "text-gray-900 dark:text-white font-bold text-right w-full"; 
+                        usernameLabel.textContent = "Usernames:";
+                        legendContainer.parentNode.appendChild(usernameLabel);
+                    }
+                });
             }
-
-
         }
     }
 
@@ -139,7 +144,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (document.getElementById("donut-chart") && typeof ApexCharts !== 'undefined') {
                 const chart = new ApexCharts(document.getElementById("donut-chart"), getChartOptions());
-                chart.render();
+                chart.render().then(() => {
+                    const legendContainer = document.querySelector("#donut-chart .apexcharts-legend");
+                    if (legendContainer) {
+                        const usernameLabel = document.createElement("div");
+                        usernameLabel.style.paddingRight = "50px";
+                        usernameLabel.className = "text-gray-900 dark:text-white font-bold text-right w-full"; 
+                        usernameLabel.textContent = "Usernames:";
+                        legendContainer.parentNode.appendChild(usernameLabel);
+                    }
+                });
 
                 // Función para manejar el cambio de checkboxes
                 function handleCheckboxChange(event, chart) {
