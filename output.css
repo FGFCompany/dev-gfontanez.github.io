@@ -969,10 +969,6 @@ video {
   height: 30rem;
 }
 
-.h-\[calc\(100\%-1rem\)\] {
-  height: calc(100% - 1rem);
-}
-
 .h-full {
   height: 100%;
 }

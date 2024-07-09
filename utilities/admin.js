@@ -3,30 +3,25 @@ document.addEventListener("DOMContentLoaded", function () {
     const database = supabase.createClient('https://svdtdtpqscizmxlcicox.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZHRkdHBxc2Npem14bGNpY294Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY2NTU2ODEsImV4cCI6MjAzMjIzMTY4MX0.9Hkev2jhj11Q6r6DXrf2gpixaVTDj2vODRYwpxB5Y50');
     // Inicializar EmailJS
     emailjs.init('XTFEjpctSxusEo9IC');
-
+    // Call the functions to create the charts
     chartsUsersTracking()
     chartsUsersTicket()
-
     // Call the functions to load the information
     loadUsersTracking();
     loadUsersTicket();
-    let selectedUserTracking = null;
-    let selectedUserTicket = null;
 
 
-
+    // Functions to create the charts
     async function chartsUsersTracking() {
         const { data: dbChartUsersTracking, error } = await database.rpc('get_tempuserstracking_request');
-    
         if (error) {
             console.error('Error fetching data:', error);
         } else {
             const chartUsers = dbChartUsersTracking.map(item => item.tempuser);
             const chartRequest = dbChartUsersTracking.map(item => item.count);
-    
+            const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            const color = theme === 'dark' ? '#FFFFFF' : 'rgb(55, 61, 63)';
             const getChartOptions = () => {
-                const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                const color = theme === 'dark' ? '#FFFFFF' : 'rgb(55, 61, 63)';
                 return {
                     series: chartRequest,
                     chart: {
@@ -70,10 +65,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                 };
             };
-    
             if (document.getElementById("pie-chart") && typeof ApexCharts !== 'undefined') {
                 const chart = new ApexCharts(document.getElementById("pie-chart"), getChartOptions());
-                chart.render();
+                chart.render().then(() => {
+                    // Apply color to legend text
+                    document.querySelectorAll('#pie-chart .apexcharts-legend-text').forEach((element) => {
+                        element.style.color = color;
+                    });
+                });
             }
         }
     }
@@ -86,9 +85,9 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             const chartUsers = dbChartUsersTicket.map(item => item.tempuser);
             const chartRequest = dbChartUsersTicket.map(item => item.count);
+            const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            const color = theme === 'dark' ? '#FFFFFF' : 'rgb(55, 61, 63)';
             const getChartOptions = () => {
-                const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                const color = theme === 'dark' ? '#FFFFFF' : 'rgb(55, 61, 63)';
                 return {
                     series: chartRequest,
                     chart: {
@@ -132,36 +131,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                 }
             };
-
             if (document.getElementById("donut-chart") && typeof ApexCharts !== 'undefined') {
                 const chart = new ApexCharts(document.getElementById("donut-chart"), getChartOptions());
-                chart.render();
-
-                // Función para manejar el cambio de checkboxes
-                function handleCheckboxChange(event, chart) {
-                    const checkbox = event.target;
-                    if (checkbox.checked) {
-                        // Lógica para actualizar según el checkbox seleccionado, si aplica
-                    } else {
-                        // Restaurar datos originales si el checkbox se deselecciona
-                        chart.updateSeries(chartRequest); // Usar los datos originales
-                    }
-                }
-
-                // Obtener todos los checkboxes por su clase
-                const checkboxes = document.querySelectorAll('#devices input[type="checkbox"]');
-
-                // Adjuntar el event listener a cada checkbox
-                checkboxes.forEach((checkbox) => {
-                    checkbox.addEventListener('change', (event) => handleCheckboxChange(event, chart));
+                chart.render().then(() => {
+                    // Apply color to legend text
+                    document.querySelectorAll('#donut-chart .apexcharts-legend-text').forEach((element) => {
+                        element.style.color = color;
+                    });
                 });
             }
         }
     }
 
 
-
-
+    // Event listener
+    let selectedUserTracking = null;
+    let selectedUserTicket = null;
     // Event listener for the change event on the select element Tracking
     document.getElementById('usersTracking').addEventListener('change', function () {
         selectedUserTracking = this.value;

@@ -196,6 +196,8 @@ document.addEventListener("DOMContentLoaded", function () {
         ticketSelectedPdfBtn.classList.add('inline-flex');
         const updateNewTicket = document.getElementById('updateNewTicket');
         updateNewTicket.classList.remove('hidden');
+        const addCloseOption = document.getElementById('closeOption');
+        addCloseOption.classList.remove('hidden');
         // Agregar los valores en los campos
         document.getElementById('fullName').value = fullnameSelect;
         document.getElementById('status').value = statusSelect;
@@ -296,6 +298,9 @@ document.addEventListener("DOMContentLoaded", function () {
         saveNewTicket.classList.remove('hidden');
         const updateNewTicket = document.getElementById('updateNewTicket');
         updateNewTicket.classList.add('hidden');
+        const removeCloseOption = document.getElementById('closeOption');
+        removeCloseOption.classList.add('hidden');
+
         // Resetear el formulario
         document.getElementById('ticketForm').reset();
         // Cerrar el modal al hacer clic en cualquier lugar de la pantalla
