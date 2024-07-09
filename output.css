@@ -3265,10 +3265,6 @@ element::-webkit-scrollbar {
 }
 
 @media (min-width: 768px) {
-  .md\:inset-0 {
-    inset: 0px;
-  }
-
   .md\:p-5 {
     padding: 1.25rem;
   }
