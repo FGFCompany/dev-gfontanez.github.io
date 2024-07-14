@@ -295,7 +295,6 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 const vehicleSelect = rowSelectedVehicle[0].vehicle;
                 const coordinatesSelect = JSON.parse(rowSelectedVehicle[0].position);
-                console.log('coordinatesSelect:', coordinatesSelect);
                 const addressSelect = rowSelectedVehicle[0].positionGeocoded;
                 const speedSelect = rowSelectedVehicle[0].speed;
                 const timestampSelect = rowSelectedVehicle[0].created_at;
@@ -328,7 +327,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const popupContent = `<b>Vehicle:</b> ${vehicleSelect} <br><b>Address:</b> ${addressSelect} <br> <b> ${coordinates} </b> <br>`;
                 const selectedMap = L.map('trackingSelectedMap', { zoomControl: false, addControl: false, scrollWheelZoom: false, touchZoom: false, doubleClickZoom: false, dragging: false, touchZoomRotate: false }).setView([coordinatesSelect[0], coordinatesSelect[1]], 18);
-                console.log('selectedMap coordinates:', coordinatesSelect);
                 const tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png';
                 L.tileLayer(tileUrl).addTo(selectedMap);
                 L.marker([coordinatesSelect[0], coordinatesSelect[1]]).addTo(selectedMap).bindPopup(popupContent).openPopup();
@@ -557,7 +555,6 @@ document.addEventListener("DOMContentLoaded", function () {
     async function onAddComment(event) {
         event.preventDefault();
         const comment = "Admin: " + document.getElementById("comments").value;
-        console.log('Los comment:', comment);
         const ticketId = document.getElementById('ticketId').value;
         // Primero, obtenemos el array de comentarios actual
         const { data: currentCommentsData, error } = await database

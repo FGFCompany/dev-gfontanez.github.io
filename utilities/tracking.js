@@ -190,7 +190,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     const reverseResponse = await fetch(apiUrl);
                     const reverseData = await reverseResponse.json();
                     const address = reverseData.address || 'No street name was found';
-                    console.log('Nombre de la calle:', address.state);
 
                     const { data: insertedData, error } = await database
                         .from('tracking')
@@ -208,12 +207,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (error) {
                         console.error('Error inserting data into Supabase:', error);
                     } else {
-                        console.log('Inserted data:', insertedData);
                         if (insertedData.length > 0) {
                             const insertedRecord = insertedData[0];
-                            console.log('Vehicle:', insertedRecord.vehicle);
-                            console.log('Position Geocoded:', insertedRecord.positionGeocoded);
-                            console.log('Speed:', insertedRecord.speed);
 
                             insertVehicleData(insertedRecord.vehicle, insertedRecord.positionGeocoded, insertedRecord.speed, insertedRecord.created_at, insertedRecord.id);
                         }
@@ -321,11 +316,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Función manejadora del evento de clic en las filas
     async function rowSelectedVehicle(event) {
         const selectedRow = event.currentTarget; // Guardar la fila seleccionada
-        console.log('Selected row:', selectedRow);
         const idSelect = selectedRow.querySelector('.idSelect').value;
 
         if (idSelect) {
-            console.log('idSelect:', idSelect);
             const { data: rowSelectedVehicle, error } = await database
                 .from('tracking')
                 .select('*')
@@ -336,7 +329,6 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 const vehicleSelect = rowSelectedVehicle[0].vehicle;
                 const coordinatesSelect = JSON.parse(rowSelectedVehicle[0].position);
-                console.log('coordinatesSelect:', coordinatesSelect);
                 const addressSelect = rowSelectedVehicle[0].positionGeocoded;
                 const speedSelect = rowSelectedVehicle[0].speed;
                 const timestampSelect = rowSelectedVehicle[0].created_at;
@@ -373,7 +365,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const popupContent = `<b>Vehicle:</b> ${vehicleSelect} <br><b>Address:</b> ${addressSelect} <br> <b> ${coordinates} </b> <br>`;
                 const selectedMap = L.map('trackingSelectedMap', { zoomControl: false, addControl: false, scrollWheelZoom: false, touchZoom: false, doubleClickZoom: false, dragging: false, touchZoomRotate: false }).setView([coordinatesSelect[0], coordinatesSelect[1]], 18);
-                console.log('selectedMap coordinates:', coordinatesSelect);
                 const tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png';
                 L.tileLayer(tileUrl).addTo(selectedMap);
                 L.marker([coordinatesSelect[0], coordinatesSelect[1]]).addTo(selectedMap).bindPopup(popupContent).openPopup();
