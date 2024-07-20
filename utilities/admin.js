@@ -302,6 +302,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Mostrar el modal con id Tracking "static-modal"
                 const modal = document.getElementById('static-modal');
                 modal.style.display = 'flex';
+                document.body.classList.add('overflow-hidden');
                 document.getElementById('modalTitle').innerText = 'Vehicle-' + vehicleSelect;
 
                 // LLenar los valores en los campos del modal
@@ -335,6 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const closeBtnTracking = document.getElementById('closeBtnTracking');
                 closeBtnTracking.addEventListener('click', () => {
                     modal.style.display = 'none';
+                    document.body.classList.remove('overflow-hidden');
                 });
             }
         } else {
@@ -478,6 +480,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Mostrar el modal
                 const modal = document.getElementById('static-modal-ticket');
                 modal.style.display = 'flex';
+                document.body.classList.add('overflow-hidden');
                 document.getElementById('modalTitle-ticket').innerText = 'Ticket-' + idSelect;
 
                 // Agregar los valores en los campos
@@ -504,6 +507,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const closeBtnTicket = document.getElementById('closeBtnTicket');
                 closeBtnTicket.addEventListener('click', () => {
                     modal.style.display = 'none';
+                    document.body.classList.remove('overflow-hidden');
                 });
             }
         } else {
@@ -609,7 +613,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('contactSubject').value = '';
         document.getElementById('contactMessage').value = '';
         modal.style.display = 'flex';
-
+        document.body.classList.add('overflow-hidden');
         // Abrir el modal al hacer clic en el enlace
         contactEmailLink.addEventListener('click', function (event) {
             event.preventDefault();
@@ -647,6 +651,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const closeBtnContact = document.getElementById('closeBtnContact');
         closeBtnContact.addEventListener('click', () => {
             modal.style.display = 'none';
+            document.body.classList.remove('overflow-hidden');
         });
     };
 

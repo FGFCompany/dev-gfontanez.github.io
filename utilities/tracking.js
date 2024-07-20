@@ -336,6 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Mostrar el modal con id "static-modal"
                 const modal = document.getElementById('static-modal');
                 modal.style.display = 'flex';
+                document.body.classList.add('overflow-hidden');
                 document.getElementById('modalTitle').innerText = 'Vehicle-' + vehicleSelect;
                 const trackingSelectedPdfBtn = document.getElementById('trackingSelectedPdfBtn');
                 trackingSelectedPdfBtn.classList.remove('hidden');
@@ -373,6 +374,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const closeBtn = document.getElementById('closeBtn');
                 closeBtn.addEventListener('click', () => {
                     modal.style.display = 'none';
+                    document.body.classList.remove('overflow-hidden');
                 });
             }
         } else {
@@ -420,6 +422,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('contactSubject').value = '';
         document.getElementById('contactMessage').value = '';
         modal.style.display = 'flex';
+        document.body.classList.add('overflow-hidden');
         // Abrir el modal al hacer clic en el enlace
         contactEmailLink.addEventListener('click', function (event) {
             event.preventDefault();
@@ -457,6 +460,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const closeBtnContact = document.getElementById('closeBtnContact');
         closeBtnContact.addEventListener('click', () => {
             modal.style.display = 'none';
+            document.body.classList.remove('overflow-hidden');
         });
     };
 
